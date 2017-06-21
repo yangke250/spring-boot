@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>cn.linkedcare.springboot</groupId>
+  <artifactId>spring-boot</artifactId>
+  <version>0.0.1</version>
+  <packaging>pom</packaging>
+  <modules>
+  	<module>common</module>
+  	<module>spring-boot-common</module>
+  	<module>spring-boot-dubbo</module>
+  	<module>spring-boot-rocketmq</module>
+  	<module>spring-boot-redis</module>
+  </modules>
+  <properties>
+  	<spring.booter>1.4.4.RELEASE</spring.booter>
+  	<redis.version>2.9.0</redis.version>
+  </properties>
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-test</artifactId>
+    		<version>${spring.booter}</version>
+		</dependency>
+  		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring.booter}</version>
+        </dependency>
+        <dependency>
+    		<groupId>redis.clients</groupId>
+    		<artifactId>jedis</artifactId>
+    		<version>${redis.version}</version>
+		</dependency>
+  	</dependencies>
+  </dependencyManagement>
+</project>
