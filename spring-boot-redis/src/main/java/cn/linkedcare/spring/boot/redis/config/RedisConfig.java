@@ -4,8 +4,12 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -18,57 +22,11 @@ import cn.linkedcare.spring.boot.redis.Launch;
 @Configurable
 public class RedisConfig {
 	
+	public static final Logger log = LoggerFactory.getLogger(RedisConfig.class);
+	
 	@Resource(name="redisPropertyConfig")
-	private RedisPropertyConfig propertyConfig;
+	private PropertyConfig propertyConfig;
 	
-	private String host;
-	private String password;
-	private int port;
-	private int db;
-	private int timeout;
-	
-	
-	
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	public int getDb() {
-		return db;
-	}
-
-	public void setDb(int db) {
-		this.db = db;
-	}
-
-	public int getTimeout() {
-		return timeout;
-	}
-
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
-	}
-
 	private JedisPoolConfig createJedisPoolConfig(){
 		JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
 		jedisPoolConfig.setMaxTotal(50);//最大连接数
@@ -77,9 +35,14 @@ public class RedisConfig {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean(RwSplitRedisTemplate.class)
 	private RwSplitRedisTemplate createRwSplitRedisTemplate(){
 		RwSplitRedisTemplate rwSplitRedisTemplate = new RwSplitRedisTemplate();
 		rwSplitRedisTemplate.setJedisPoolConfig(createJedisPoolConfig());
+		
+		log.info("=========================================");
+		log.info("=============spring boot redis===========");
+		log.info("=============spring redis host==========="+propertyConfig.getHost());
 		rwSplitRedisTemplate.setHost(propertyConfig.getHost());
 		rwSplitRedisTemplate.setPort(propertyConfig.getPort());
 		rwSplitRedisTemplate.setDb(propertyConfig.getDb());
