@@ -14,9 +14,26 @@
   <properties>
   	<spring.booter>1.4.4.RELEASE</spring.booter>
   	<redis.version>2.9.0</redis.version>
+  	<dubbo.version>2.5.3</dubbo.version>
+  	<reflections.version>0.9.11</reflections.version>
   </properties>
   <dependencyManagement>
   	<dependencies>
+  		<dependency>
+    		<groupId>com.alibaba</groupId>
+    		<artifactId>dubbo</artifactId>
+    		<version>${dubbo.version}</version>
+		</dependency>
+		<dependency>
+    		<groupId>com.101tec</groupId>
+    		<artifactId>zkclient</artifactId>
+    		<version>0.10</version>
+		</dependency>
+  		<dependency>
+    		<groupId>org.reflections</groupId>
+    		<artifactId>reflections</artifactId>
+    		<version>${reflections.version}</version>
+		</dependency>
   		<dependency>
     		<groupId>org.springframework.boot</groupId>
     		<artifactId>spring-boot-starter-test</artifactId>
