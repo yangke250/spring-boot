@@ -68,7 +68,7 @@ public class CachePreAop extends AbstarctPreAop{
 
 	@Override
 	public int order() {
-		return 3;
+		return 10;
 	}
 
 	@Override
@@ -109,7 +109,9 @@ public class CachePreAop extends AbstarctPreAop{
     		
     		String key = getKey(cache.keyMethod(),target,method,args);
         	byte[] result  = redisTemplate.get(key.getBytes(ENCODEING));
-    		
+    		if(result==null){
+    			return null;
+    		}
         	       	
         	return new String(result,ENCODEING);
     	}catch(Exception e){

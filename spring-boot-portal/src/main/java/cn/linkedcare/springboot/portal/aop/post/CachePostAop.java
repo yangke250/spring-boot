@@ -56,14 +56,14 @@ public class CachePostAop extends AbstarctPostAop {
     private void doSaveOrUpdateCache(Object target,Method method,Object[] args,Object result){
     	try{
     		Cache cache = method.getAnnotation(Cache.class);
-        	if(cache!=null){
+        	if(cache!=null&&result!=null){
         		String key = CachePreAop.getKey(cache.keyMethod(),target,method,args);
             	redisTemplate.setex(key.getBytes(ENCODEING),cache.timeout(),JSON.toJSONString(result).getBytes(ENCODEING));
             	return;
         	}
         	
         	CacheReload cacheReload = method.getAnnotation(CacheReload.class);
-        	if(cacheReload!=null){
+        	if(cacheReload!=null&&result!=null){
         		String key = CachePreAop.getKey(cacheReload.keyMethod(),target,method,args);
             	redisTemplate.setex(key.getBytes(ENCODEING),cache.timeout(),JSON.toJSONString(result).getBytes(ENCODEING));
             	return;
