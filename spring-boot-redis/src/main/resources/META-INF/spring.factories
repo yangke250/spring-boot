@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-cn.linkedcare.spring.boot.redis.Launch
+cn.linkedcare.springboot.redis.Launch
