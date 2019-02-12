@@ -2,23 +2,81 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>cn.linkedcare.springboot</groupId>
   <artifactId>spring-boot</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.4</version>
   <packaging>pom</packaging>
   <modules>
-  	<module>common</module>
   	<module>spring-boot-common</module>
   	<module>spring-boot-dubbo</module>
   	<module>spring-boot-rocketmq</module>
   	<module>spring-boot-redis</module>
+  	<module>spring-boot-mybatis</module>
+  	<module>spring-boot-validate</module>
+  	<module>spring-boot-zipkin</module>
+  	<module>spring-boot-limitrate</module>
+  	<module>spring-boot-hystrix</module>
+  	<module>spring-boot-portal</module>
+
+
+  	<module>spring-boot-kafka-transaction</module>
   </modules>
   <properties>
-  	<spring.booter>1.4.4.RELEASE</spring.booter>
+  	<spring.booter>1.5.1.RELEASE</spring.booter>
   	<redis.version>2.9.0</redis.version>
   	<dubbo.version>2.5.3</dubbo.version>
   	<reflections.version>0.9.11</reflections.version>
+  	<mybatis.version>3.4.1</mybatis.version>
+  	<mybatis-spring.version>1.3.0</mybatis-spring.version>
+  	<mysql.version>5.1.40</mysql.version>
+  	<druid.version>1.0.29</druid.version>
+  	<hibernate.version>6.0.1.Final</hibernate.version>
+    <javax.el.version>3.0.0</javax.el.version>
+    <web.el.version>2.2.6</web.el.version>
+    <elasticsearch.version>2.0.0.M3</elasticsearch.version>
+    <config.version>1.3.3.RELEASE</config.version>
+    <kafka.version>1.1.4.RELEASE</kafka.version>
   </properties>
   <dependencyManagement>
   	<dependencies>
+  		<dependency>
+    		<groupId>org.springframework.kafka</groupId>
+    		<artifactId>spring-kafka</artifactId>
+    		<version>${kafka.version}</version>
+		</dependency>
+  		<dependency>
+    		<groupId>com.alibaba</groupId>
+    		<artifactId>fastjson</artifactId>
+    		<version>1.2.23</version>
+    	</dependency>
+  		<dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+    		<version>${config.version}</version>
+		</dependency>
+		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+    		<version>>${elasticsearch.version}</version>
+		</dependency>
+  		<dependency>  
+            <groupId>org.glassfish.web</groupId>  
+            <artifactId>javax.el</artifactId>  
+            <version>${web.el.version}</version>  
+     	</dependency>
+        <dependency>
+    		<groupId>javax.el</groupId>
+    		<artifactId>javax.el-api</artifactId>
+    		<version>${javax.el.version}</version>
+		</dependency>
+        <dependency>
+    		<groupId>org.hibernate</groupId>
+    		<artifactId>hibernate-validator</artifactId>
+    		<version>${hibernate.version}</version>
+		</dependency>
+  	    <dependency>  
+        	<groupId>org.springframework.boot</groupId>  
+        	<artifactId>spring-boot-starter-aop</artifactId>  
+    		<version>${spring.booter}</version>
+		</dependency>  
   		<dependency>
     		<groupId>com.alibaba</groupId>
     		<artifactId>dubbo</artifactId>
@@ -45,10 +103,47 @@
             <version>${spring.booter}</version>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring.booter}</version>
+        </dependency>
+        <dependency>
     		<groupId>redis.clients</groupId>
     		<artifactId>jedis</artifactId>
     		<version>${redis.version}</version>
 		</dependency>
+		<dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+        </dependency>
+  		<dependency>
+    		<groupId>mysql</groupId>
+    		<artifactId>mysql-connector-java</artifactId>
+    		<version>${mysql.version}</version>
+		</dependency>
+  		<dependency>
+    		<groupId>org.mybatis</groupId>
+    		<artifactId>mybatis</artifactId>
+    		<version>${mybatis.version}</version>
+		</dependency>
+		<dependency>
+    	    <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>${mybatis-spring.version}</version>
+    	</dependency>
   	</dependencies>
   </dependencyManagement>
+  <distributionManagement>
+		<repository>
+			<id>public</id>
+			<name>admin</name>
+			<url>http://120.55.82.162:8081/repository/linkedcare/</url>
+		</repository>
+		<snapshotRepository>
+			<id>public</id>
+			<name>admin1</name>
+			<url>http://120.55.82.162:8081/repository/linkedcare/</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
