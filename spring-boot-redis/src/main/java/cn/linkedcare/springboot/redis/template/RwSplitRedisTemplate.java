@@ -66,7 +66,10 @@ public class RwSplitRedisTemplate implements RedisTemplate {
             log.error("JedisConnectionException error", connEx);
         } catch (Exception e) {
             log.error("redis access exception", e);
-        }
+        }finally {
+    		if(jedis!=null)
+    			pool.returnResource(jedis);
+		}
         return null;
     }
 
