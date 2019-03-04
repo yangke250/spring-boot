@@ -79,6 +79,15 @@ public class CachePreAop extends AbstarctPreAop{
 	
 	/**
      * 得到缓存的key
+     * @param key 取key的方法
+     * @return
+     */
+    public static  String getKey(String key){
+        return appName+key;
+    }
+	
+	/**
+     * 得到缓存的key
      * @param methodName 取key的方法
      * @param target 被代理的类
      * @param method 相关的方法
