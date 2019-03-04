@@ -153,11 +153,7 @@ public class ValidateAop extends AbstarctPreAop{
 		for(Object o:objects){
 			ValidateResult result  = doValidate(o,as[i]);
 			if(!result.isResult()){
-				try {
-					super.wirte("{\"msg\":\""+URLEncoder.encode(result.getMsg(), "utf-8") +"\",\"result\":400}");
-				} catch (UnsupportedEncodingException e) {
-					logger.error("UnsupportedEncodingException:{}",e);
-				}
+				super.wirte("{\"msg\":\""+result.getMsg()+"\",\"result\":400}");
 				return false;
 			}
 			i++;

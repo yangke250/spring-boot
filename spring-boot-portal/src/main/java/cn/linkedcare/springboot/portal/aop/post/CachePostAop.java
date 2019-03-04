@@ -57,8 +57,16 @@ public class CachePostAop extends AbstarctPostAop {
     	try{
     		Cache cache = method.getAnnotation(Cache.class);
         	if(cache!=null&&result!=null){
+        		//得到缓存
         		String key = CachePreAop.getKey(cache.keyMethod(),target,method,args);
             	redisTemplate.setex(key.getBytes(ENCODEING),cache.timeout(),JSON.toJSONString(result).getBytes(ENCODEING));
+            	
+            	//是否缓存再浏览器
+            	int time = cache.cacheBrowserTime();
+            	if(time>0){
+            		getResponse().setHeader("cache-control","max-age="+time);
+            		getResponse().setHeader("last-modified",""+System.currentTimeMillis());
+                }
             	return;
         	}
         	

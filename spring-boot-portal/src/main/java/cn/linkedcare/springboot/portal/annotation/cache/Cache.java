@@ -24,4 +24,6 @@ public @interface Cache {
 	 * @return
 	 */
 	public int timeout();
+	
+	public int cacheBrowserTime() default 0;
 }
