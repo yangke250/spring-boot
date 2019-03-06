@@ -28,17 +28,18 @@
   			<artifactId>spring-boot-redis</artifactId>
   			<version>0.0.4</version>
   		</dependency>
-  </dependencies>
+  </dependencies>  
   <distributionManagement>  
         <repository>  
-            <id>releases</id>  
+            <id>public</id>  
             <name>admin</name>  
             <url>http://120.55.82.162:8081/repository/linkedcare/</url>  
         </repository>
         <snapshotRepository>  
-            <id>snapshots</id>  
+            <id>public</id>  
             <name>admin1</name>  
             <url>http://120.55.82.162:8081/repository/linkedcare/</url>  
         </snapshotRepository>  
-    </distributionManagement>   
+  </distributionManagement> 
+    
 </project>
