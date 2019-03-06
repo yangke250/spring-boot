@@ -69,7 +69,8 @@ public class RedisConfig {
 	        JedisSentinelPool pool = new JedisSentinelPool(REDIS_NAME,
 	        		sentinels,jedisPoolConfig,redisTimeout,redisTimeout,
 	        		redisPassword,redisDb);
-			return pool;
+	        
+	        return pool;
 		}else{
 			String[] args = redisUrl.split(":");
 			// 创建连接池
@@ -92,6 +93,8 @@ public class RedisConfig {
 		
 		return rwSplitRedisTemplate;
 	}
+	
+	
 	
 	
 	
