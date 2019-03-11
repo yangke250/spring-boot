@@ -37,21 +37,40 @@ public class ConversationTimer implements SimpleJob{
 	//分片总数
 	public static final int SHARDING_TOTAL = 1;
 	
+	private static String zkUrl;
+	
+	private static String url;
+	
+	private static String username;
+	
+	private static String password;
+
+	
 	@Value("${token.zookeeper.url}")
-	private String zkUrl;
-	
+	public void setZkUrl(String zkUrl) {
+		ConversationTimer.zkUrl = zkUrl;
+	}
+
 	@Value("${token.url}")
-	private String url;
-	
+	public void setUrl(String url) {
+		ConversationTimer.url = url;
+	}
+
 	@Value("${token.username}")
-	private String username;
-	
+	public void setUsername(String username) {
+		ConversationTimer.username = username;
+	}
+
 	@Value("${token.password}")
-	private String password;
-	
-	
+	public void setPassword(String password) {
+		ConversationTimer.password = password;
+	}
+
 	@PostConstruct
 	public void init() {
+		//先刷新的token
+		TokenManage.refreshToken(url, username, password);
+		//再定时刷新token
         new JobScheduler(createRegistryCenter(), createJobConfiguration()).init();
     }
     
@@ -61,11 +80,13 @@ public class ConversationTimer implements SimpleJob{
         regCenter.init();
         return regCenter;
     }
+
     
     private  LiteJobConfiguration createJobConfiguration() {
         // 创建作业配置
     	JobCoreConfiguration simpleCoreConfig = JobCoreConfiguration.
-    			newBuilder(this.getClass().getName(),"0 0/1 * * * ?",SHARDING_TOTAL).build();
+    			newBuilder(this.getClass().getName(),"0 0/1 * * * ?",SHARDING_TOTAL)
+    			.build();
 	    // 定义SIMPLE类型配置
 	    SimpleJobConfiguration simpleJobConfig = new SimpleJobConfiguration(simpleCoreConfig,ConversationTimer.class.getCanonicalName());
 	    // 定义Lite作业根配置
@@ -74,7 +95,7 @@ public class ConversationTimer implements SimpleJob{
     }
 
 	@Override
-	public void execute(ShardingContext arg0) {
+	public void execute(ShardingContext context) {
 		logger.info("token begin ...:{},{},{}",url, username, password);
 		//当前时间毫秒
 		TokenManage.refreshToken(url, username, password);
