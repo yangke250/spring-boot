@@ -1,0 +1,6 @@
+token:
+  uername: client
+  password: secret
+  zookeeper:
+    url: 114.55.255.143:2181
+  url: https://openplatform-app.lctest.cn:11001
