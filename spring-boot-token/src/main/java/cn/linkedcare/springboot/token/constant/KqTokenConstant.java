@@ -1,9 +1,11 @@
 package cn.linkedcare.springboot.token.constant;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-@PropertySource(name = "jdbc-bainuo-dev.properties", 
+@Configuration
+@PropertySource(
 value = {"classpath:application-${spring.profiles.active}.properties"},
 ignoreResourceNotFound = false, encoding = "UTF-8")
 public class KqTokenConstant {
@@ -27,7 +29,7 @@ public class KqTokenConstant {
 		return tokenUsername;
 	}
 
-	@Value("${token.username}")
+	@Value("${kq.token.username}")
 	public void setTokenUsername(String tokenUsername) {
 		KqTokenConstant.tokenUsername = tokenUsername;
 	}
@@ -36,7 +38,7 @@ public class KqTokenConstant {
 		return tokenPassword;
 	}
 
-	@Value("${token.password}")
+	@Value("${kq.token.password}")
 	public void setTokenPassword(String tokenPassword) {
 		KqTokenConstant.tokenPassword = tokenPassword;
 	}
@@ -45,7 +47,7 @@ public class KqTokenConstant {
 		return tokenUrl;
 	}
 
-	@Value("${token.url}")
+	@Value("${kq.token.url}")
 	public void setTokenUrl(String tokenUrl) {
 		KqTokenConstant.tokenUrl = tokenUrl;
 	}
@@ -55,7 +57,7 @@ public class KqTokenConstant {
 		return oldTokenTenantId;
 	}
 
-	@Value("${oldToken.tenantId}")
+	@Value("${kq.oldToken.tenantId}")
 	public void setOldTokenTenantId(String oldTokenTenantId) {
 		KqTokenConstant.oldTokenTenantId = oldTokenTenantId;
 	}
@@ -64,7 +66,7 @@ public class KqTokenConstant {
 		return oldTokenTicket;
 	}
 
-	@Value("${oldToken.ticket}")
+	@Value("${kq.oldToken.ticket}")
 	public void setOldTokenTicket(String oldTokenTicket) {
 		KqTokenConstant.oldTokenTicket = oldTokenTicket;
 	}
@@ -73,7 +75,7 @@ public class KqTokenConstant {
 		return oldTokenUrl;
 	}
 
-	@Value("${oldToken.url}")
+	@Value("${kq.oldToken.url}")
 	public void setOldTokenUrl(String oldTokenUrl) {
 		KqTokenConstant.oldTokenUrl = oldTokenUrl;
 	}

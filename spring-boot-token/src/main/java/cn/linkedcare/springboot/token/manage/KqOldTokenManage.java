@@ -10,6 +10,10 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSON;
 
 import cn.linkedcare.springboot.token.constant.KqTokenConstant;
@@ -30,6 +34,7 @@ import okhttp3.RequestBody;
  *
  */
 @Slf4j
+@Component
 public class KqOldTokenManage implements ITokenManage{
 
 	private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();

@@ -15,8 +15,14 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.event.SpringApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -39,7 +45,8 @@ import cn.linkedcare.springboot.token.manage.KqTokenManage;
  *
  */
 @Component
-public class ConversationTimer implements SimpleJob,BeanPostProcessor{
+@Order(value=Integer.MAX_VALUE)
+public class ConversationTimer implements SimpleJob,BeanPostProcessor,ApplicationListener<SpringApplicationEvent>{
 	
 	public static final Logger logger = LoggerFactory.getLogger(ConversationTimer.class);
 	
@@ -48,22 +55,10 @@ public class ConversationTimer implements SimpleJob,BeanPostProcessor{
 	public static final int SHARDING_TOTAL = 1;
 	
 	@Value("${zookeeper.url}")
-	private static String zkUrl;
+	private String zkUrl;
 	
 	private Executor executor = null;
 
-
-	@PostConstruct
-	public void init() {
-		executor = Executors.newFixedThreadPool(map.size());
-		
-		//先刷新的token
-		refreshToken();
-		//再定时刷新token
-        new JobScheduler(createRegistryCenter(), createJobConfiguration()).init();
-    }
-    
-	
 	private void refreshToken(){
 		CountDownLatch cdl = new CountDownLatch(map.size());
 
@@ -141,6 +136,22 @@ public class ConversationTimer implements SimpleJob,BeanPostProcessor{
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		// TODO Auto-generated method stub
-		return null;
+		return bean;
 	}
+
+
+	@Override
+	public void onApplicationEvent(SpringApplicationEvent event) {
+		
+		if(event instanceof ApplicationReadyEvent){
+			executor = Executors.newFixedThreadPool(map.size());
+			//先刷新的token
+			refreshToken();
+			//再定时刷新token
+	        new JobScheduler(createRegistryCenter(), createJobConfiguration()).init();
+		}
+	}
+
+
+	
 }
