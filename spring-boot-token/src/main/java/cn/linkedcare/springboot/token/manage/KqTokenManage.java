@@ -8,6 +8,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.alibaba.fastjson.JSON;
 
+import cn.linkedcare.springboot.token.constant.KqTokenConstant;
+import cn.linkedcare.springboot.token.intercepter.RetryIntercepter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
@@ -23,7 +25,7 @@ import okhttp3.RequestBody;
  *
  */
 @Slf4j
-public class TokenManage {
+public class KqTokenManage {
 
 	private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 	private static volatile String token;
@@ -33,6 +35,11 @@ public class TokenManage {
 
 	public static final String BEARER="bearer ";
 
+	private static OkHttpClient client = new OkHttpClient.Builder()
+			.connectTimeout(2, TimeUnit.SECONDS)
+			.readTimeout(2, TimeUnit.SECONDS)
+			.addInterceptor(new RetryIntercepter(2))
+			.build();
 
 	@Data
 	public static class TokenReponse {
@@ -49,20 +56,22 @@ public class TokenManage {
 	 * @param password
 	 * @return
 	 */
-	public static void refreshToken(String url, String username, String password) {
+	public static void refreshToken() {
 		long now = System.currentTimeMillis() / 1000;
 
 		if (now < nextTimeOut) {
 			return;
 		}
 
-		String token = "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+		String token = "Basic " + Base64.getEncoder().encodeToString(
+				(KqTokenConstant.getTokenUsername() + ":" + KqTokenConstant.getTokenPassword()).getBytes());
 
-		OkHttpClient client = new OkHttpClient.Builder().connectTimeout(2, TimeUnit.SECONDS)
-				.readTimeout(2, TimeUnit.SECONDS).build();
-
-		final Request request = new Request.Builder().url(url + "/connect/token").addHeader("Authorization", token)
-				.post(RequestBody.create(MediaType.get(MEDIA_TYPE), "grant_type=client_credentials")).build();
+		
+		final Request request = new Request.Builder()
+				.url(KqTokenConstant.getTokenUrl() + "/connect/token")
+				.addHeader("Authorization", token)
+				.post(RequestBody.create(MediaType.get(MEDIA_TYPE), "grant_type=client_credentials"))
+				.build();
 
 		Call call = client.newCall(request);
 
