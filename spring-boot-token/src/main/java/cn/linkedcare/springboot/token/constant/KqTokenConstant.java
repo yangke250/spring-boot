@@ -6,8 +6,10 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @PropertySource(
-value = {"classpath:application-${spring.profiles.active}.properties"},
-ignoreResourceNotFound = false, encoding = "UTF-8")
+value = {
+		"classpath:application.properties",
+		"classpath:application-${spring.profiles.active}.properties"},
+ignoreResourceNotFound = true, encoding = "UTF-8")
 public class KqTokenConstant {
 
 	
