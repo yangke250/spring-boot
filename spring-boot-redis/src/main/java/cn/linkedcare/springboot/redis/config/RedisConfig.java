@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import cn.linkedcare.springboot.redis.Launch;
+import cn.linkedcare.springboot.redis.constant.RedisConstant;
 import cn.linkedcare.springboot.redis.template.RwSplitRedisTemplate;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -37,19 +38,12 @@ public class RedisConfig {
 	public static final Logger log = LoggerFactory.getLogger(RedisConfig.class);
 	
 
-	@Value("${redis.url}")
-	private String redisUrl;
-	@Value("${redis.db}")
-	private int redisDb;
-	@Value("${redis.password}")
-	private String redisPassword;
-	@Value("${redis.timeout}")
-	private int redisTimeout;
-	@Value("${redis.type}")
-	private RedisType redisType;
+
 	
 	public static enum RedisType{
 		sentinel,//哨兵连接池
+		single,//单连接池
+		@Deprecated
 		signle;//单连接池
 	}
 	
@@ -59,11 +53,20 @@ public class RedisConfig {
 		JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
 		jedisPoolConfig.setMaxTotal(50);
 		jedisPoolConfig.setMaxWaitMillis(2000);
+		String redisPassword = null;
+		String redisUrl = RedisConstant.getRedisUrl();
+		int redisDb = RedisConstant.getRedisDb();
+		int redisTimeout = RedisConstant.getRedisTimeout();
 		
-		if(StringUtils.isEmpty(redisPassword)){
-			redisPassword=null;
+		log.info("=========================================");
+		log.info("=============spring redis host==========="+redisUrl+"===="+redisPassword);
+
+		
+		//不为空的时候设置值
+		if(!StringUtils.isEmpty(RedisConstant.getRedisPassword())){
+			redisPassword=RedisConstant.getRedisPassword();
 		}
-		if(RedisType.sentinel==redisType){
+		if(RedisType.sentinel==RedisConstant.getRedisType()){
 			Set<String> sentinels = new HashSet<>(Arrays.asList(redisUrl.split(",")));
 	        // 创建连接池
 	        JedisSentinelPool pool = new JedisSentinelPool(REDIS_NAME,
@@ -88,9 +91,6 @@ public class RedisConfig {
 	private RwSplitRedisTemplate createRwSplitRedisTemplate(){
 		RwSplitRedisTemplate rwSplitRedisTemplate = new RwSplitRedisTemplate(createJedisPool());
 	
-		log.info("=========================================");
-		log.info("=============spring redis host==========="+redisUrl+"===="+redisPassword);
-		
 		return rwSplitRedisTemplate;
 	}
 	
