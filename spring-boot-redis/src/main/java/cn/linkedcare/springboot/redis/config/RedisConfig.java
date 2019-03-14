@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
@@ -33,66 +34,31 @@ import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.util.Pool;
 
 
-@Configurable
-@Order
+@Configuration
+@PropertySource(
+value = {
+		"classpath:application-redis.properties",
+		"classpath:application-redis-${spring.profiles.active}.properties"},
+ignoreResourceNotFound = true, encoding = "UTF-8")
 public class RedisConfig {
 	
 	public static final Logger log = LoggerFactory.getLogger(RedisConfig.class);
 	
-	private static String redisUrl;
-	
-	private static int redisDb;
-	
-	private static String redisPassword;
-	
-	private static int redisTimeout;
-	
-	private static RedisType redisType;
-	
-	
-	public static String getRedisUrl() {
-		return redisUrl;
-	}
 	@Value("${redis.url}")
-	public void setRedisUrl(String redisUrl) {
-		RedisConfig.redisUrl = redisUrl;
-	}
-	
-	public static int getRedisDb() {
-		return redisDb;
-	}
+	private String redisUrl;
 	
 	@Value("${redis.db}")
-	public void setRedisDb(int redisDb) {
-		RedisConfig.redisDb = redisDb;
-	}
-	
-	public static String getRedisPassword() {
-		return redisPassword;
-	}
+	private int redisDb;
 	
 	@Value("${redis.password}")
-	public void setRedisPassword(String redisPassword) {
-		RedisConfig.redisPassword = redisPassword;
-	}
-	
-	public static int getRedisTimeout() {
-		return redisTimeout;
-	}
+	private String redisPassword;
 	
 	@Value("${redis.timeout}")
-	public void setRedisTimeout(int redisTimeout) {
-		RedisConfig.redisTimeout = redisTimeout;
-	}
+	private int redisTimeout;
 	
-	
-	public static RedisType getRedisType() {
-		return redisType;
-	}
 	@Value("${redis.type}")
-	public void setRedisType(RedisType redisType) {
-		RedisConfig.redisType = redisType;
-	}
+	private RedisType redisType;
+	
 
 	
 	public static enum RedisType{
@@ -140,8 +106,7 @@ public class RedisConfig {
 
 	@Bean
 	@ConditionalOnMissingBean(RwSplitRedisTemplate.class)
-	@Order
-	private RwSplitRedisTemplate createRwSplitRedisTemplate(){
+	public RwSplitRedisTemplate createRwSplitRedisTemplate(){
 		RwSplitRedisTemplate rwSplitRedisTemplate = new RwSplitRedisTemplate(createJedisPool());
 	
 		return rwSplitRedisTemplate;
