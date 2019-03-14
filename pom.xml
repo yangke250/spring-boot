@@ -6,12 +6,13 @@
 	<version>0.0.4</version>
 	<packaging>pom</packaging>
 	<modules>
-		<module>spring-boot-common</module>
 		<module>spring-boot-redis</module>
 		<module>spring-boot-hystrix</module>
 		<module>spring-boot-portal</module>
 		<module>spring-boot-hbase</module>
 		<module>spring-boot-cachecenter</module>
+		<module>spring-boot-kafka</module>
+		<module>spring-boot-token</module>
 	</modules>
 	<properties>
 		<spring.booter>1.5.1.RELEASE</spring.booter>
@@ -31,6 +32,26 @@
 	</properties>
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>com.squareup.okhttp3</groupId>
+				<artifactId>okhttp</artifactId>
+				<version>3.13.1</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dangdang</groupId>
+				<artifactId>elastic-job-lite-core</artifactId>
+				<version>2.0.4</version>
+			</dependency>
+			<dependency>
+				<groupId>com.dangdang</groupId>
+				<artifactId>elastic-job-lite-spring</artifactId>
+				<version>2.0.4</version>
+			</dependency>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>1.18.4</version>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.kafka</groupId>
 				<artifactId>spring-kafka</artifactId>
