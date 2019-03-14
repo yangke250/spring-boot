@@ -2,9 +2,13 @@ package cn.linkedcare.springboot.kafka.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.annotation.Order;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
@@ -18,9 +22,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@PropertySource(
+value = {
+		"classpath:application-kafka.properties",
+		"classpath:application-kafka-${spring.profiles.active}.properties"},
+ignoreResourceNotFound = true, encoding = "UTF-8")
 public class KafkaConsumerConfig {
 
-    @Value("${kafka.servers}")
+	@Value("${kafka.servers}")
     private String servers;
     @Value("${kafka.consumer.enable.auto.commit}")
     private boolean enableAutoCommit;
@@ -36,6 +45,7 @@ public class KafkaConsumerConfig {
     private int concurrency;
     
     @Bean
+    @ConditionalOnMissingBean(KafkaListenerContainerFactory.class)
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());

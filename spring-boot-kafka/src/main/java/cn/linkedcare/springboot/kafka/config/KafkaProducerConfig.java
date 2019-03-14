@@ -5,15 +5,27 @@ import java.util.Map;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.annotation.Order;
 import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
-@Configuration
+
+@PropertySource(
+value = {
+		"classpath:application-kafka.properties",
+		"classpath:application-kafka-${spring.profiles.active}.properties"},
+ignoreResourceNotFound = true, encoding = "UTF-8")
+@Configurable
+@Order
 public class KafkaProducerConfig {
 
 	@Value("${kafka.servers}")
@@ -51,8 +63,11 @@ public class KafkaProducerConfig {
     public ProducerFactory<String, String> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
+    
+    
 
     @Bean
+    @ConditionalOnMissingBean(KafkaTemplate.class)
     public KafkaTemplate<String, String> kafkaTemplate() {
         return new KafkaTemplate<String, String>(producerFactory());
     }
