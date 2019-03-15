@@ -9,6 +9,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
+import com.auth0.jwt.JWTVerifier;
 
 import cn.linkedcare.mall.common.dto.auth.MallContextDto;
 import cn.linkedcare.mall.common.dto.auth.SaasContextDto;
@@ -52,21 +53,37 @@ public class HttpSessionInterceptor  implements HandlerInterceptor{
 	
 
 	/**
+	 * 是否是jwt token
+	 * @param request
+	 * @return
+	 */
+	private boolean isJWTToken(HttpServletRequest request){
+		String token = request.getHeader(AUTH);
+		if(token==null){
+			return false;
+		}
+		final String[] pieces = token.split("\\.");
+        if (pieces.length != 3) {
+        	return false;
+        }
+        	return true;
+	}
+	
+	/**
 	 * 设置前端的session
 	 * @param request
 	 * @return
 	 */
 	private void setFrontSession(HttpServletRequest request){
-		String auth = request.getHeader(AUTH);
-		if(auth==null){
-			throw new RuntimeException("auth is null!");
+		if(!isJWTToken(request)){
+			return;
 		}
 		
-		log.info("front content:{}",JSON.toJSONString(auth));
+		String token = request.getHeader(AUTH);
+		log.info("front content:{}",JSON.toJSONString(token));
 		
-		MallContextDto mallContextDto = JwtUtil.getWxContext(auth);
+		MallContextDto mallContextDto = JwtUtil.getWxContext(token);
 		frontThreadLocal.set(mallContextDto);
-
 	}
 	
 	/**
@@ -74,13 +91,14 @@ public class HttpSessionInterceptor  implements HandlerInterceptor{
 	 * @param request
 	 */
 	private void setBackSession(HttpServletRequest request){
-		String auth = request.getHeader(AUTH);
-		if(auth==null){
-			throw new RuntimeException("auth is null!");
+		if(!isJWTToken(request)){
+			return;
 		}
-		log.info("back content:{}",JSON.toJSONString(auth));
 		
-		SaasContextDto saasContextDto = JwtUtil.getSaaSContext(auth);
+		String token = request.getHeader(AUTH);
+		log.info("back content:{}",JSON.toJSONString(token));
+		
+		SaasContextDto saasContextDto = JwtUtil.getSaaSContext(token);
 		backThreadLocal.set(saasContextDto);
 	}
 	
