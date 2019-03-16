@@ -46,11 +46,11 @@ import cn.linkedcare.springboot.token.manage.KqTokenManage;
  */
 @Component
 @Order(value=Integer.MAX_VALUE)
-public class ConversationTimer implements SimpleJob,BeanPostProcessor,ApplicationListener<SpringApplicationEvent>{
+public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListener<SpringApplicationEvent>{
 	
-	public static final Logger logger = LoggerFactory.getLogger(ConversationTimer.class);
+	public static final Logger logger = LoggerFactory.getLogger(TokenTimer.class);
 	
-	private Map<ITokenManage,ITokenManage> map = new HashMap<ITokenManage,ITokenManage>();
+	private static Map<ITokenManage,ITokenManage> map = new HashMap<ITokenManage,ITokenManage>();
 	//分片总数
 	public static final int SHARDING_TOTAL = 1;
 	
@@ -62,18 +62,20 @@ public class ConversationTimer implements SimpleJob,BeanPostProcessor,Applicatio
 	private void refreshToken(){
 		CountDownLatch cdl = new CountDownLatch(map.size());
 
+		logger.info("start 1 refreshToken.....{}",map.size());
+
 		for(ITokenManage tokenManage:map.values()){
 			
 			executor.execute(new TokenThread(tokenManage,cdl));
 		}
-		logger.info("start refreshToken.....{}",System.currentTimeMillis());
+		logger.info("start 2 refreshToken.....{}",System.currentTimeMillis());
 		try {
 			cdl.await();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		logger.info("end refreshToken.....{}",System.currentTimeMillis());
+		logger.info("end 3 refreshToken.....{}",System.currentTimeMillis());
 	}
 	
     private  CoordinatorRegistryCenter createRegistryCenter() {
@@ -90,7 +92,7 @@ public class ConversationTimer implements SimpleJob,BeanPostProcessor,Applicatio
     			newBuilder(this.getClass().getName(),"0 0/1 * * * ?",SHARDING_TOTAL)
     			.build();
 	    // 定义SIMPLE类型配置
-	    SimpleJobConfiguration simpleJobConfig = new SimpleJobConfiguration(simpleCoreConfig,ConversationTimer.class.getCanonicalName());
+	    SimpleJobConfiguration simpleJobConfig = new SimpleJobConfiguration(simpleCoreConfig,TokenTimer.class.getCanonicalName());
 	    // 定义Lite作业根配置
 	    LiteJobConfiguration simpleJobRootConfig = LiteJobConfiguration.newBuilder(simpleJobConfig).build();
 	    return simpleJobRootConfig;
@@ -117,6 +119,8 @@ public class ConversationTimer implements SimpleJob,BeanPostProcessor,Applicatio
 		@Override
 		public void run() {
 			try{
+				logger.info("thread refreshToken.....{}",tokenManage.getClass().getName());
+
 				tokenManage.refreshToken();
 			}finally {
 				cdl.countDown();
@@ -127,6 +131,8 @@ public class ConversationTimer implements SimpleJob,BeanPostProcessor,Applicatio
 
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		logger.info("refreshToken.....{}",bean.getClass().getName());
+
 		if(bean instanceof ITokenManage){
 			map.put((ITokenManage)bean,(ITokenManage)bean);
 		}

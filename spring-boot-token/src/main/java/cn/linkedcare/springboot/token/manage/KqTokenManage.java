@@ -102,6 +102,9 @@ public class KqTokenManage implements ITokenManage{
 			int expireTime = (int) tokenRes.getExpires_in();
 			
 			redisTemplate.setex(TOKEN_PRE+KqTokenManage.class.getName(),expireTime,token);
+			
+			log.info("refreshToken:{}",JSON.toJSONString(tokenRes));
+			
 			nextTimeOut = now + tokenRes.getExpires_in() - 300;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -115,6 +118,8 @@ public class KqTokenManage implements ITokenManage{
 		try {
 			lock.readLock().lock();
 			String token = redisTemplate.get(TOKEN_PRE+KqTokenManage.class.getName());
+
+			log.info("getToken KqTokenManage:{}",token);
 
 			return token;
 		} finally {

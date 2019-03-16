@@ -9,14 +9,17 @@ import com.alibaba.fastjson.JSON;
 
 import cn.linkedcare.springboot.token.intercepter.RetryIntercepter;
 import cn.linkedcare.springboot.token.manage.KqTokenManage;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.HttpUrl.Builder;
+import sun.util.logging.resources.logging;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
+@Slf4j
 public class HttpUtils {
 	private static OkHttpClient client = new OkHttpClient.Builder()
 			.connectTimeout(2, TimeUnit.SECONDS)
@@ -118,13 +121,15 @@ public class HttpUtils {
 	 * @return
 	 */
 	public static  String getPostJSONBody(String url,Object object,Class<?> classzz){
+		String json = JSON.toJSONString(object);
 		final Request request = new Request.Builder()
 				.url(url)
 				.addHeader("Authorization",KqTokenManage.getToken())
 				.post(RequestBody.create(MediaType.get("application/json;charset=utf-8"),
-						JSON.toJSONString(object)))
+						json))
 				.build();
 
+		log.info("url:{},json;{}",url,json);
 		Call call   = client.newCall(request);
 		
 		try {
