@@ -10,12 +10,15 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.Resource;
+
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 
+import cn.linkedcare.springboot.redis.template.RedisTemplate;
 import cn.linkedcare.springboot.token.constant.KqTokenConstant;
 import cn.linkedcare.springboot.token.intercepter.RetryIntercepter;
 import lombok.Builder;
@@ -38,15 +41,20 @@ import okhttp3.RequestBody;
 public class KqOldTokenManage implements ITokenManage{
 
 	private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-	private static volatile String token;
 	private static volatile long nextTimeOut = 0;
 
 	public static final String MEDIA_TYPE = "application/json;charset=utf-8";
 	
 	public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	
-
 	
+	private static RedisTemplate redisTemplate;
+	
+	@Resource 
+	public void setRedisTemplate(RedisTemplate redisTemplate) {
+		KqOldTokenManage.redisTemplate = redisTemplate;
+	}
+
 	private static OkHttpClient client = new OkHttpClient.Builder()
 			.connectTimeout(2, TimeUnit.SECONDS)
 			.readTimeout(2, TimeUnit.SECONDS)
@@ -111,8 +119,14 @@ public class KqOldTokenManage implements ITokenManage{
 			TokenReponse tokenRes = JSON.parseObject(body, TokenReponse.class);
 
 			// 提前5分钟刷新token
-			token = tokenRes.getToken();
-			nextTimeOut = now + getNextExpiredTime(tokenRes.getExpiredTime())/1000 - 300;
+			String token = tokenRes.getToken();
+			
+			int expiredTime = (int) (getNextExpiredTime(tokenRes.getExpiredTime())/1000);
+			
+			redisTemplate.setex(TOKEN_PRE+KqOldTokenManage.class.getName(),expiredTime,token);
+			
+			
+			nextTimeOut = now + expiredTime - 300;
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.error("exception:{}", e);
@@ -124,6 +138,7 @@ public class KqOldTokenManage implements ITokenManage{
 	public static String getToken() {
 		try {
 			lock.readLock().lock();
+			String token = redisTemplate.get(TOKEN_PRE+KqOldTokenManage.class.getName());
 			return token;
 		} finally {
 			lock.readLock().unlock();

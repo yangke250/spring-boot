@@ -6,10 +6,14 @@ import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
+import com.sun.media.jfxmedia.logging.Logger;
 
+import cn.linkedcare.springboot.redis.template.RedisTemplate;
 import cn.linkedcare.springboot.token.constant.KqTokenConstant;
 import cn.linkedcare.springboot.token.intercepter.RetryIntercepter;
 import lombok.Data;
@@ -28,7 +32,7 @@ import okhttp3.RequestBody;
  */
 @Slf4j
 @Component
-public class KqTokenManage {
+public class KqTokenManage implements ITokenManage{
 
 	private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 	private static volatile String token;
@@ -38,6 +42,14 @@ public class KqTokenManage {
 
 	public static final String BEARER="bearer ";
 
+	private static RedisTemplate redisTemplate;
+	
+	@Resource 
+	public void setRedisTemplate(RedisTemplate redisTemplate) {
+		KqTokenManage.redisTemplate = redisTemplate;
+	}
+	
+	
 	private static OkHttpClient client = new OkHttpClient.Builder()
 			.connectTimeout(2, TimeUnit.SECONDS)
 			.readTimeout(2, TimeUnit.SECONDS)
@@ -59,7 +71,7 @@ public class KqTokenManage {
 	 * @param password
 	 * @return
 	 */
-	public static void refreshToken() {
+	public void refreshToken() {
 		long now = System.currentTimeMillis() / 1000;
 
 		if (now < nextTimeOut) {
@@ -86,6 +98,10 @@ public class KqTokenManage {
 
 			// 提前5分钟刷新token
 			token = BEARER+tokenRes.getAccess_token();
+			
+			int expireTime = (int) tokenRes.getExpires_in();
+			
+			redisTemplate.setex(TOKEN_PRE+KqTokenManage.class.getName(),expireTime,token);
 			nextTimeOut = now + tokenRes.getExpires_in() - 300;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -98,6 +114,8 @@ public class KqTokenManage {
 	public static String getToken() {
 		try {
 			lock.readLock().lock();
+			String token = redisTemplate.get(TOKEN_PRE+KqTokenManage.class.getName());
+
 			return token;
 		} finally {
 			lock.readLock().unlock();

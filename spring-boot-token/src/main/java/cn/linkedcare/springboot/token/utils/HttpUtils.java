@@ -44,7 +44,7 @@ public class HttpUtils {
 	 */
 	public static  <T> T doPostJSON(String url,Object object,Class<T> classzz){
 		String body = getPostJSONBody(url,object,classzz);
-
+		
 		return (T)JSON.parseObject(body, classzz);
 	}
 	
