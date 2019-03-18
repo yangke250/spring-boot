@@ -57,7 +57,7 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 	@Value("${zookeeper.url}")
 	private String zkUrl;
 	
-	private Executor executor = null;
+	private  static Executor executor = null;
 
 	private void refreshToken(){
 		CountDownLatch cdl = new CountDownLatch(map.size());

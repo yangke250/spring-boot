@@ -13,8 +13,12 @@ public class HttpLogger implements Interceptor  {
 	public Response intercept(Chain chain) throws IOException {
 		Request request = chain.request(); 
 		log.info("HttpLogger request:{}",request.toString());
-		Response response = chain.proceed(request); 
-		log.info("HttpLogger response:{}",response.toString());
+		Response response = chain.proceed(request);
+		String resString =null; 
+		if(response.body()!=null){
+			resString = response.body().string();
+		}
+		log.info("HttpLogger response:{},{}",response.toString(),resString);
 		return response; 
 	}
 

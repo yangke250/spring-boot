@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.alibaba.fastjson.JSON;
 
+import cn.linkedcare.springboot.token.intercepter.HttpLogger;
 import cn.linkedcare.springboot.token.intercepter.RetryIntercepter;
 import cn.linkedcare.springboot.token.manage.KqTokenManage;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class HttpUtils {
 			.connectTimeout(2, TimeUnit.SECONDS)
 			.readTimeout(2, TimeUnit.SECONDS)
 			.addInterceptor(new RetryIntercepter(1)) //默认重试1次
+			.addInterceptor(new HttpLogger())
 			.build();
 	
 	/**
@@ -129,7 +131,6 @@ public class HttpUtils {
 						json))
 				.build();
 
-		log.info("url:{},json;{}",url,json);
 		Call call   = client.newCall(request);
 		
 		try {
