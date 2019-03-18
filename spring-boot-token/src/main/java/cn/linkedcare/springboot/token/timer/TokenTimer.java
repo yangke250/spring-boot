@@ -37,7 +37,7 @@ import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperConfiguration;
 import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter;
 
 import cn.linkedcare.springboot.token.manage.ITokenManage;
-import cn.linkedcare.springboot.token.manage.KqTokenManage;
+import cn.linkedcare.springboot.token.manage.KqKyzlTokenManage;
 
 /**
  * 对于服务重启登，会话结束没有通知的补偿

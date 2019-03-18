@@ -9,7 +9,7 @@ import com.alibaba.fastjson.JSON;
 
 import cn.linkedcare.springboot.token.intercepter.HttpLogger;
 import cn.linkedcare.springboot.token.intercepter.RetryIntercepter;
-import cn.linkedcare.springboot.token.manage.KqTokenManage;
+import cn.linkedcare.springboot.token.manage.KqKyzlTokenManage;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import okhttp3.HttpUrl;
@@ -99,7 +99,7 @@ public class HttpUtils {
 		
 		final Request request = new Request.Builder()
 				.url(url)
-				.addHeader("Authorization",KqTokenManage.getToken())
+				.addHeader("Authorization",KqKyzlTokenManage.getToken())
 				.get()
 				.build();
 
@@ -126,7 +126,7 @@ public class HttpUtils {
 		String json = JSON.toJSONString(object);
 		final Request request = new Request.Builder()
 				.url(url)
-				.addHeader("Authorization",KqTokenManage.getToken())
+				.addHeader("Authorization",KqKyzlTokenManage.getToken())
 				.post(RequestBody.create(MediaType.get("application/json;charset=utf-8"),
 						json))
 				.build();

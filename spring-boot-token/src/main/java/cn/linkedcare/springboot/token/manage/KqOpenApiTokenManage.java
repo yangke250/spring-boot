@@ -2,20 +2,26 @@ package cn.linkedcare.springboot.token.manage;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Resource;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
-import com.sun.media.jfxmedia.logging.Logger;
 
 import cn.linkedcare.springboot.redis.template.RedisTemplate;
 import cn.linkedcare.springboot.token.constant.KqTokenConstant;
 import cn.linkedcare.springboot.token.intercepter.RetryIntercepter;
+import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
@@ -25,31 +31,29 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 /**
- * token管理
- * 
+ * 口腔openApi的token
  * @author wl
  *
  */
 @Slf4j
 @Component
-public class KqTokenManage implements ITokenManage{
+public class KqOpenApiTokenManage implements ITokenManage{
 
 	private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-	private static volatile String token;
 	private static volatile long nextTimeOut = 0;
 
-	public static final String MEDIA_TYPE = "application/x-www-form-urlencoded;charset=utf-8";
-
-	public static final String BEARER="bearer ";
-
+	public static final String MEDIA_TYPE = "application/json;charset=utf-8";
+	
+	public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	
+	
 	private static RedisTemplate redisTemplate;
 	
 	@Resource 
 	public void setRedisTemplate(RedisTemplate redisTemplate) {
-		KqTokenManage.redisTemplate = redisTemplate;
+		KqOpenApiTokenManage.redisTemplate = redisTemplate;
 	}
-	
-	
+
 	private static OkHttpClient client = new OkHttpClient.Builder()
 			.connectTimeout(2, TimeUnit.SECONDS)
 			.readTimeout(2, TimeUnit.SECONDS)
@@ -58,11 +62,29 @@ public class KqTokenManage implements ITokenManage{
 
 	@Data
 	public static class TokenReponse {
-		private String access_token;
-		private long expires_in;
-		private String token_type;
+		private String token;
+		private String tokenType;
+		private String expiredTime;
 	}
 
+	@Data
+	@Builder
+	public static class TokenLogin{
+		private String tenantId;
+		private String ticket;
+	}
+	
+	private long getNextExpiredTime(String date){
+		Date d = null;
+		try {
+			d = sdf.parse(date);
+			return d.getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
 	/**
 	 * 返回超时的下次超时的秒
 	 * 
@@ -71,21 +93,20 @@ public class KqTokenManage implements ITokenManage{
 	 * @param password
 	 * @return
 	 */
-	public void refreshToken() {
+	public  void refreshToken() {
 		long now = System.currentTimeMillis() / 1000;
 
 		if (now < nextTimeOut) {
 			return;
 		}
 
-		String token = "Basic " + Base64.getEncoder().encodeToString(
-				(KqTokenConstant.getTokenUsername() + ":" + KqTokenConstant.getTokenPassword()).getBytes());
-
+		TokenLogin tokenLogin = new TokenLogin.TokenLoginBuilder()
+		.tenantId(KqTokenConstant.getOldTokenTenantId())
+		.ticket(KqTokenConstant.getOldTokenTicket()).build();
 		
 		final Request request = new Request.Builder()
-				.url(KqTokenConstant.getTokenUrl() + "/connect/token")
-				.addHeader("Authorization", token)
-				.post(RequestBody.create(MediaType.get(MEDIA_TYPE), "grant_type=client_credentials"))
+				.url(KqTokenConstant.getOldTokenUrl() + "/api/v1/public/logon")
+				.post(RequestBody.create(MediaType.get(MEDIA_TYPE),JSON.toJSONString(tokenLogin)))
 				.build();
 
 		Call call = client.newCall(request);
@@ -97,15 +118,14 @@ public class KqTokenManage implements ITokenManage{
 			TokenReponse tokenRes = JSON.parseObject(body, TokenReponse.class);
 
 			// 提前5分钟刷新token
-			token = BEARER+tokenRes.getAccess_token();
+			String token = tokenRes.getToken();
 			
-			int expireTime = (int) tokenRes.getExpires_in();
+			int expiredTime = (int) (getNextExpiredTime(tokenRes.getExpiredTime())/1000);
 			
-			redisTemplate.setex(TOKEN_PRE+KqTokenManage.class.getName(),expireTime,token);
+			redisTemplate.setex(TOKEN_PRE+KqOpenApiTokenManage.class.getName(),expiredTime,token);
 			
-			log.info("refreshToken:{}",JSON.toJSONString(tokenRes));
 			
-			nextTimeOut = now + tokenRes.getExpires_in() - 300;
+			nextTimeOut = now + expiredTime - 300;
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.error("exception:{}", e);
@@ -117,10 +137,7 @@ public class KqTokenManage implements ITokenManage{
 	public static String getToken() {
 		try {
 			lock.readLock().lock();
-			String token = redisTemplate.get(TOKEN_PRE+KqTokenManage.class.getName());
-
-			log.info("getToken KqTokenManage:{}",token);
-
+			String token = redisTemplate.get(TOKEN_PRE+KqOpenApiTokenManage.class.getName());
 			return token;
 		} finally {
 			lock.readLock().unlock();
