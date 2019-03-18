@@ -131,8 +131,6 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		logger.info("refreshToken.....{}",bean.getClass().getName());
-
 		if(bean instanceof ITokenManage){
 			map.put((ITokenManage)bean,(ITokenManage)bean);
 		}
