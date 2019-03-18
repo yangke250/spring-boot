@@ -12,6 +12,7 @@ import cn.linkedcare.springboot.token.intercepter.RetryIntercepter;
 import cn.linkedcare.springboot.token.manage.KqKyzlTokenManage;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
+import okhttp3.ConnectionPool;
 import okhttp3.HttpUrl;
 import okhttp3.HttpUrl.Builder;
 import sun.util.logging.resources.logging;
@@ -22,11 +23,13 @@ import okhttp3.RequestBody;
 
 @Slf4j
 public class HttpUtils {
+    private static ConnectionPool pool = new ConnectionPool(10, 10, TimeUnit.MINUTES);
 	private static OkHttpClient client = new OkHttpClient.Builder()
 			.connectTimeout(2, TimeUnit.SECONDS)
 			.readTimeout(2, TimeUnit.SECONDS)
 			.addInterceptor(new RetryIntercepter(1)) //默认重试1次
 			.addInterceptor(new HttpLogger())
+			.connectionPool(pool)
 			.build();
 	
 	/**
