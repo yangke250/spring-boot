@@ -11,8 +11,8 @@ import okhttp3.Response;
 public class RetryIntercepter implements Interceptor {
 
     public int maxRetry;//最大重试次数
-    private int retryNum = 0;//假如设置为3次重试的话，则最大可能请求4次（默认1次+3次重试）
-
+    private int retryNum = 0;//已请求次数
+    
     public RetryIntercepter(int maxRetry) {
         this.maxRetry = maxRetry;
     }
@@ -20,7 +20,9 @@ public class RetryIntercepter implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
+        //第一次请求
         Response response = chain.proceed(request);
+        //重试请求
         while (!response.isSuccessful() && retryNum < maxRetry) {
             retryNum++;
             

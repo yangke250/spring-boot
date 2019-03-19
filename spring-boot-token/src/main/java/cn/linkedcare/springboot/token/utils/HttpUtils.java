@@ -26,8 +26,8 @@ public class HttpUtils {
     private static ConnectionPool pool = new ConnectionPool(10, 10, TimeUnit.MINUTES);
 	private static OkHttpClient client = new OkHttpClient.Builder()
 			.connectTimeout(2, TimeUnit.SECONDS)
-			.readTimeout(2, TimeUnit.SECONDS)
-			.addInterceptor(new RetryIntercepter(1)) //默认重试1次
+			.readTimeout(10, TimeUnit.SECONDS)
+			.addInterceptor(new RetryIntercepter(2)) //默认重试2次
 			.addInterceptor(new HttpLogger())
 			.connectionPool(pool)
 			.build();
