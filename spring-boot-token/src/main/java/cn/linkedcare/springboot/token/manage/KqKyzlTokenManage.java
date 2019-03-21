@@ -8,6 +8,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
@@ -35,7 +36,9 @@ import okhttp3.RequestBody;
 public class KqKyzlTokenManage implements ITokenManage{
 
 	private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-	private static volatile String token;
+
+	private static volatile String openUrl;
+	
 	private static volatile long nextTimeOut = 0;
 
 	public static final String MEDIA_TYPE = "application/x-www-form-urlencoded;charset=utf-8";
@@ -44,6 +47,17 @@ public class KqKyzlTokenManage implements ITokenManage{
 
 	private static RedisTemplate redisTemplate;
 	
+	
+	
+	public static String getOpenUrl() {
+		return openUrl;
+	}
+
+	@Value("${kq.token.openUrl}")
+	public void setOpenUrl(String openUrl) {
+		KqKyzlTokenManage.openUrl = openUrl;
+	}
+
 	@Resource 
 	public void setRedisTemplate(RedisTemplate redisTemplate) {
 		KqKyzlTokenManage.redisTemplate = redisTemplate;

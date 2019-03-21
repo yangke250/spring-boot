@@ -12,6 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -46,9 +47,20 @@ public class KqOpenApiTokenManage implements ITokenManage{
 	
 	public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	
-	
+	private static String openUrl;
 	private static RedisTemplate redisTemplate;
 	
+	
+	
+	public static String getOpenUrl() {
+		return openUrl;
+	}
+
+	@Value("${kq.oldToken.openUrl}")
+	public void setOpenUrl(String openUrl) {
+		KqOpenApiTokenManage.openUrl = openUrl;
+	}
+
 	@Resource 
 	public void setRedisTemplate(RedisTemplate redisTemplate) {
 		KqOpenApiTokenManage.redisTemplate = redisTemplate;
