@@ -41,6 +41,11 @@
     		<artifactId>spring-boot-redis</artifactId>
     		<version>0.0.4</version>
     	</dependency>
+    	<dependency>
+    		<groupId>cn.linkedcare.springboot</groupId>
+    		<artifactId>spring-boot-cachecenter</artifactId>
+    		<version>0.0.4</version>
+    	</dependency>
   </dependencies>
   <build>
 		<finalName>spring-boot-portal</finalName>
@@ -88,17 +93,5 @@
         </plugins>
 	</build>
   
-  <distributionManagement>  
-        <repository>  
-            <id>public</id>  
-            <name>admin</name>  
-            <url>http://120.55.82.162:8081/repository/linkedcare/</url>  
-        </repository>
-        <snapshotRepository>  
-            <id>public</id>  
-            <name>admin1</name>  
-            <url>http://120.55.82.162:8081/repository/linkedcare/</url>  
-        </snapshotRepository>  
-    </distributionManagement>
   
 </project>

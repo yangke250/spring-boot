@@ -1,4 +1,4 @@
-package cn.linkedcare.springboot.portal.aop.pre;
+package cn.linkedcare.springboot.portal.aop;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validation;
@@ -26,16 +27,58 @@ import javax.validation.constraints.Size;
 import javax.validation.groups.Default;
 
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import cn.linkedcare.springboot.portal.annotation.validate.NeedValidateBody;
-import cn.linkedcare.springboot.portal.aop.AbstarctPreAop;
 
-@Component
-public class ValidateAop extends AbstarctPreAop{
+@Aspect  
+@EnableAspectJAutoProxy(proxyTargetClass = true,exposeProxy=true)
+@Component 
+@Order(value=0)
+public class ValidateInterceptor {
 
 	
+	/** 
+     * 定义拦截规则
+     *  and @annotation(org.springframework.web.bind.annotation.RequestMapping)
+     */  
+    @Pointcut("execution(* cn.linkedcare..controller..*.*(..))")  
+    public void methodPointcut(){} 
+    
+    /** 
+     * 拦截器具体实现 
+     * @param pjp 
+     * @return JsonResult（被拦截方法的执行结果，或需要登录的错误提示。） 
+     * @throws Throwable 
+     */  
+    @Around("methodPointcut()") //指定拦截器规则；也可以直接把“execution(* com.xjj.........)”写进这里  
+    public Object Interceptor(ProceedingJoinPoint pjp) throws Throwable{  
+    	Object[] objects = pjp.getArgs();
+		
+		MethodSignature signature = (MethodSignature) pjp.getSignature();  
+        Method method = signature.getMethod(); //获取被拦截的方法
+        Annotation[][] as = method.getParameterAnnotations();
+        
+        int i =0;
+		for(Object o:objects){
+			ValidateResult result  = doValidate(o,as[i]);
+			if(!result.isResult()){
+				HttpServletResponse response = BrowserCacheAop.getResponse();
+				response.getWriter().write("{\"msg\":\""+result.getMsg()+"\",\"result\":400}");
+				return null;
+			}
+			i++;
+		}
+        
+		return pjp.proceed();
+    }
 	
 	@Resource(name="validator")
 	private Validator validator;
@@ -141,36 +184,7 @@ public class ValidateAop extends AbstarctPreAop{
 		return result;
 	}
 	
-	@Override
-	public boolean doFilter(ProceedingJoinPoint pjp) {
-		Object[] objects = pjp.getArgs();
-		
-		MethodSignature signature = (MethodSignature) pjp.getSignature();  
-        Method method = signature.getMethod(); //获取被拦截的方法
-        Annotation[][] as = method.getParameterAnnotations();
-        
-        int i =0;
-		for(Object o:objects){
-			ValidateResult result  = doValidate(o,as[i]);
-			if(!result.isResult()){
-				super.wirte("{\"msg\":\""+result.getMsg()+"\",\"result\":400}");
-				return false;
-			}
-			i++;
-		}
-		
-		return true;
-	}
 
-	@Override
-	public int order() {
-		return 2;
-	}
-
-	@Override
-	public void finallyMethod(ProceedingJoinPoint pjp) {
-		
-	}
 
 
 
