@@ -50,7 +50,9 @@ public class KqOpenApiTokenManage implements ITokenManage{
 	private static String openUrl;
 	private static RedisTemplate redisTemplate;
 	
-	
+	public static final void main(String[] args) {
+		System.out.print(MediaType.get(MEDIA_TYPE));
+	}
 	
 	public static String getOpenUrl() {
 		return openUrl;
