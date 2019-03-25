@@ -20,14 +20,14 @@ public @interface Cache {
 	public String keyMethod();
 	
 	/**
-	 * 缓存失效的时间,默认一分钟
+	 * 缓存失效的时间
 	 * @return
 	 */
-	public int timeout() default 60;
-
+	public int timeout();
+	
 	/**
-	 * 缓存的类
+	 * 值为空时候，是否设置默认值到redis
 	 * @return
 	 */
-	public Class<?> cacheClass();
+	public boolean nullSetDefalutValue() default false;
 }
