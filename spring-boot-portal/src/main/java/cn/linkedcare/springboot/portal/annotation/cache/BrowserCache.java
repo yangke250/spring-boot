@@ -12,5 +12,5 @@ public @interface BrowserCache {
 	 * 是否使用浏览器缓存，默认60秒超时
 	 * @return
 	 */
-	public int timeOut() default 60;
+	public int timeout() default 60;
 }

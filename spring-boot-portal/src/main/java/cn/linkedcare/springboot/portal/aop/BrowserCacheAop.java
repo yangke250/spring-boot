@@ -94,7 +94,7 @@ public class BrowserCacheAop implements BaseAop {
 		long now    = System.currentTimeMillis();
 		
 		//走协商缓存
-		if(now>(header+b.timeOut()*1000)) {
+		if(now>(header+b.timeout()*1000)) {
 			HttpServletResponse response = getResponse();
 			response.setStatus(304);
 		
@@ -115,9 +115,9 @@ public class BrowserCacheAop implements BaseAop {
 		}
 		//浏览器缓存，后面的缓存不需要做
 		HttpServletResponse response = getResponse();
-		CacheControl cc = CacheControl.maxAge(b.timeOut(),TimeUnit.SECONDS);
+		CacheControl cc = CacheControl.maxAge(b.timeout(),TimeUnit.SECONDS);
 		//支持http协议 1.0
-		response.addDateHeader("Expires", System.currentTimeMillis() + b.timeOut()*1000);
+		response.addDateHeader("Expires", System.currentTimeMillis() + b.timeout()*1000);
 		//支持http协议 1.1
 		response.setHeader("Cache-Control", cc.getHeaderValue());
 		
