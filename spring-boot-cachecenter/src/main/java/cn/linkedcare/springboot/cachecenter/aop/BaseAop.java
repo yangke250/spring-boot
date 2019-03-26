@@ -27,7 +27,7 @@ public interface BaseAop extends Comparable<BaseAop> {
 	 * @param method 调用的方法
 	 * @param args   参数
 	 * @param target 对应的引用
-	 * @return
+	 * @return true代表命中缓存，不执行相关方法
 	 */
 	CacheResult executeBefore(Object target,Method method,Object[] args);
 	
@@ -37,7 +37,7 @@ public interface BaseAop extends Comparable<BaseAop> {
 	 * @param method
 	 * @param args
 	 * @param result 执行的方法
-	 * @return
+	 * @return true代表
 	 */
 	boolean executeAfter(Object target,Method method,Object[] args,Object result);
 	

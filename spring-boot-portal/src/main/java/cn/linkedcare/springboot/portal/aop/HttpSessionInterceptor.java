@@ -105,8 +105,10 @@ public class HttpSessionInterceptor  implements HandlerInterceptor{
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		log.info("http headers:{}",JSON.toJSONString(request.getHeaderNames()));
 		String platform = request.getHeader(PLATFORM);
+		
+		log.info("http headers:{},{}",platform,JSON.toJSONString(request.getHeaderNames()));
+		
 		
 		if(platform==null){
 			return true;

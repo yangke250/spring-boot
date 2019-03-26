@@ -40,7 +40,7 @@ public class RemoteCacheAop implements BaseAop{
 	
 	@Data
 	public static class CacheResult {
-		private boolean result;
+		private boolean result;//代表命中缓存，不执行相关方法
 		private Object object;
 	}
 	
@@ -106,10 +106,10 @@ public class RemoteCacheAop implements BaseAop{
 
 	@Override
 	public CacheResult executeBefore(Object target, Method method, Object[] args) {
-		boolean result = false;
+		boolean result = true;
 		Object object = doGetCache(target,method,args);
 		if(object==null) {
-			result=true;
+			result=false;
 		}
 		
 		CacheResult cacheResult = new CacheResult();
@@ -123,25 +123,36 @@ public class RemoteCacheAop implements BaseAop{
 	@Override
 	public boolean executeAfter(Object target, Method method, Object[] args, Object result) {
 		try{
+			
     		Cache cache = method.getAnnotation(Cache.class);
         	if(cache!=null){
+        		//是否防止传透
+        		if(result==null) {
+        			if(cache.nullSetDefalutValue()) {
+            			result=NULL;
+            		}else {
+            			return true;
+            		}
+        		}
+        		
+        		
         		String key = getKey(cache.keyMethod(),target,method,args);
             	redisTemplate.setex(key.getBytes(ENCODEING),cache.timeout(),JSON.toJSONString(result).getBytes(ENCODEING));
-            	return false;
+            	return true;
         	}
         	
         	CacheReload cacheReload = method.getAnnotation(CacheReload.class);
         	if(cacheReload!=null){
         		String key = getKey(cacheReload.keyMethod(),target,method,args);
             	redisTemplate.setex(key.getBytes(ENCODEING),cache.timeout(),JSON.toJSONString(result).getBytes(ENCODEING));
-            	return false;
+            	return true;
         	}
         	
         	CacheDelete cacheDelete = method.getAnnotation(CacheDelete.class);
         	if(cacheDelete!=null){
         		String key = getKey(cacheDelete.keyMethod(),target,method,args);
             	redisTemplate.del(key);
-            	return false;
+            	return true;
         	}
     	}catch(Exception e){
     		logger.error("exception:{}",e);
