@@ -63,7 +63,10 @@ public class ZkRefreshTask implements BeanPostProcessor,ApplicationListener<Spri
 				RetryPolicy retryPolicy = new ExponentialBackoffRetry(10000,Integer.MAX_VALUE);
 				CuratorFramework client = CuratorFrameworkFactory.newClient(CacheConstant.getZkUrl(), retryPolicy);
 				
-
+				//初始化所有相关数据
+				for(AbstractCacheRefresh abstractCacheRefresh:cacheRefreshsMap.get(key)){
+					abstractCacheRefresh.abstractCache(); 
+				}	
 				
 				client.start();
 				try {
@@ -82,12 +85,10 @@ public class ZkRefreshTask implements BeanPostProcessor,ApplicationListener<Spri
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		if(bean instanceof AbstractCacheRefresh) {
-			log.info(bean.getClass().getName()+"init cache....");
+			log.info(bean.getClass().getName()+" init cache....");
 			AbstractCacheRefresh abstractCacheRefresh = (AbstractCacheRefresh)bean;
-			//先初始化
-			abstractCacheRefresh.abstractCache();
-			log.info(bean.getClass().getName()+"init cache end....");
 			
+			//先初始化，再分组的方式初始化
 			String groupName = abstractCacheRefresh.cacheGroupName();
 			List<AbstractCacheRefresh> list = cacheRefreshsMap.get(groupName);
 			if(list==null) {
