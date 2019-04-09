@@ -61,7 +61,6 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 	private  static Executor executor = null;
 
 	private void refreshToken(){
-		Thread.currentThread().interrupt();//防止阻塞
 		
 		CountDownLatch cdl = new CountDownLatch(map.size());
 
