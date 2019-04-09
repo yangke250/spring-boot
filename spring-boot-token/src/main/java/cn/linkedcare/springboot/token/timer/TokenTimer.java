@@ -91,7 +91,7 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
     private  LiteJobConfiguration createJobConfiguration() {
         // 创建作业配置
     	JobCoreConfiguration simpleCoreConfig = JobCoreConfiguration.
-    			newBuilder(this.getClass().getName(),"0 0/1 * * * ?",SHARDING_TOTAL)
+    			newBuilder(this.getClass().getName(),"0 0/5 * * * ?",SHARDING_TOTAL)
     			.build();
 	    // 定义SIMPLE类型配置
 	    SimpleJobConfiguration simpleJobConfig = new SimpleJobConfiguration(simpleCoreConfig,TokenTimer.class.getCanonicalName());
@@ -102,9 +102,11 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 
 	@Override
 	public void execute(ShardingContext context) {
-		logger.info("token begin ...:{},{},{}");
+		context.getShardingItem();
+		logger.info("token begin ...:{},{}",context.getJobName(),context.getShardingItem());
 		
 		refreshToken();
+		logger.info("token end   ...:{},{}",context.getJobName(),context.getShardingItem());
 	}
 	
 	public static final class TokenThread implements Runnable{
@@ -150,6 +152,9 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 	public void onApplicationEvent(SpringApplicationEvent event) {
 		
 		if(event instanceof ApplicationReadyEvent){
+			logger.info("onApplicationEvent:========================");
+			
+			
 			executor = Executors.newFixedThreadPool(map.size());
 			//先刷新的token
 			refreshToken();
