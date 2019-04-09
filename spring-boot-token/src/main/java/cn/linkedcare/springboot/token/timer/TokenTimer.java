@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.Map;
 
 
@@ -60,6 +61,8 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 	private  static Executor executor = null;
 
 	private void refreshToken(){
+		Thread.currentThread().interrupt();//防止阻塞
+		
 		CountDownLatch cdl = new CountDownLatch(map.size());
 
 		logger.info("start 1 refreshToken.....{}",map.size());
@@ -69,8 +72,8 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 			executor.execute(new TokenThread(tokenManage,cdl));
 		}
 		logger.info("start 2 refreshToken.....{}",System.currentTimeMillis());
-		try {
-			cdl.await();
+		try {//最多阻塞10分钟
+			cdl.await(10,TimeUnit.MINUTES);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);

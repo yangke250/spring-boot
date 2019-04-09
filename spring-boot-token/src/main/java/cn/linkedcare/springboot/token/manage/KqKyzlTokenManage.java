@@ -8,6 +8,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -117,9 +118,10 @@ public class KqKyzlTokenManage implements ITokenManage{
 			
 			redisTemplate.setex(TOKEN_PRE+KqKyzlTokenManage.class.getName(),expireTime,token);
 			
-			log.info("refreshToken:{}",JSON.toJSONString(tokenRes));
 			
 			nextTimeOut = now + tokenRes.getExpires_in() - 300;
+			
+			log.info("refreshToken:{},{}",JSON.toJSONString(tokenRes),nextTimeOut);
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.error("exception:{}", e);
@@ -128,16 +130,23 @@ public class KqKyzlTokenManage implements ITokenManage{
 		}
 	}
 
+	
+	public static void main(String[] args) {
+		System.out.print(KqKyzlTokenManage.class.getName());
+	}
+
 	public static String getToken() {
+		String token =null;
+		
 		try {
 			lock.readLock().lock();
-			String token = redisTemplate.get(TOKEN_PRE+KqKyzlTokenManage.class.getName());
-
+			token = redisTemplate.get(TOKEN_PRE+KqKyzlTokenManage.class.getName());
 			log.info("getToken KqTokenManage:{}",token);
 
 			return token;
 		} finally {
 			lock.readLock().unlock();
+			//补偿
 		}
 
 	}
