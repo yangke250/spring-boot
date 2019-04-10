@@ -86,7 +86,7 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 	
     private  CoordinatorRegistryCenter createRegistryCenter() {
         CoordinatorRegistryCenter regCenter = new ZookeeperRegistryCenter(
-        		new ZookeeperConfiguration(zkUrl,"token"));
+        		new ZookeeperConfiguration(zkUrl,"refreshToken"));
         regCenter.init();
         return regCenter;
     }
