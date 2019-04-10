@@ -23,7 +23,7 @@ import okhttp3.RequestBody;
 
 @Slf4j
 public class HttpUtils {
-    private static ConnectionPool pool = new ConnectionPool(10, 10, TimeUnit.MINUTES);
+    private static ConnectionPool pool = new ConnectionPool(20, 20, TimeUnit.MINUTES);
 	private static OkHttpClient client = new OkHttpClient.Builder()
 			.connectTimeout(2, TimeUnit.SECONDS)
 			.readTimeout(10, TimeUnit.SECONDS)
