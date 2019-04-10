@@ -59,7 +59,7 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 	@Value("${zookeeper.url}")
 	private String zkUrl;
 
-	private Map<ITokenManage,ITokenManage> map = new HashMap<ITokenManage,ITokenManage>();
+	private static Map<ITokenManage,ITokenManage> map = new HashMap<ITokenManage,ITokenManage>();
 
 	private Executor executor = Executors.newFixedThreadPool( Runtime.getRuntime().availableProcessors()*2);
 
