@@ -89,6 +89,8 @@ public class KqKyzlTokenManage implements ITokenManage{
 	public void refreshToken() {
 		long now = System.currentTimeMillis() / 1000;
 
+		log.info("refreshToken:{},{}",now,nextTimeOut);
+
 		if (now < nextTimeOut) {
 			return;
 		}
@@ -116,10 +118,10 @@ public class KqKyzlTokenManage implements ITokenManage{
 			
 			int expireTime = (int) tokenRes.getExpires_in();
 			
-			redisTemplate.setex(TOKEN_PRE+KqKyzlTokenManage.class.getName(),expireTime,token);
+			redisTemplate.set(TOKEN_PRE+KqKyzlTokenManage.class.getName(),token);
 			
 			
-			nextTimeOut = now + tokenRes.getExpires_in() - TIME_OUT;
+			nextTimeOut = now + expireTime - TIME_OUT;
 			
 			log.info("refreshToken:{},{}",JSON.toJSONString(tokenRes),nextTimeOut);
 		} catch (IOException e) {

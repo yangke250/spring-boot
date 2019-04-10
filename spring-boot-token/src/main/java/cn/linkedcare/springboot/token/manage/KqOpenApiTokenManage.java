@@ -110,9 +110,12 @@ public class KqOpenApiTokenManage implements ITokenManage{
 	public  void refreshToken() {
 		long now = System.currentTimeMillis() / 1000;
 
+		log.info("refreshToken open:{},{}",now,nextTimeOut);
+
 		if (now < nextTimeOut) {
 			return;
 		}
+
 
 		TokenLogin tokenLogin = new TokenLogin.TokenLoginBuilder()
 		.tenantId(KqTokenConstant.getOldTokenTenantId())
@@ -136,10 +139,13 @@ public class KqOpenApiTokenManage implements ITokenManage{
 			
 			int expiredTime = (int) (getNextExpiredTime(tokenRes.getExpiredTime())/1000);
 			
-			redisTemplate.setex(TOKEN_PRE+KqOpenApiTokenManage.class.getName(),expiredTime,token);
+			redisTemplate.set(TOKEN_PRE+KqOpenApiTokenManage.class.getName(),token);
 			
 			//提前刷新
 			nextTimeOut = now + expiredTime - TIME_OUT;
+			
+			log.info("refreshToken open:{},{}",JSON.toJSONString(tokenRes),nextTimeOut);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.error("exception:{}", e);
