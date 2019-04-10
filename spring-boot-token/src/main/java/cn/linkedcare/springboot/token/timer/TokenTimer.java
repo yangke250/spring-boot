@@ -65,22 +65,20 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 
 	private void refreshToken(){
 	
-		CountDownLatch cdl = new CountDownLatch(map.size());
 
 		logger.info("start 1 refreshToken.....{}",map.size());
 
-		for(ITokenManage tokenManage:map.values()){
-			new Thread(new TokenThread(tokenManage,cdl)).start();
-		}
-		
 		long now  = System.currentTimeMillis();
 		logger.info("start 2 refreshToken.....{}",now);
-		try {//最多阻塞10分钟
-			cdl.await(10,TimeUnit.MINUTES);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
+		
+		for(ITokenManage tokenManage:map.values()){
+			try {//最多阻塞10分钟
+				tokenManage.refreshToken();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
+		
 		logger.info("end 3 refreshToken.....{}",System.currentTimeMillis()-now);
 	}
 	
