@@ -1,6 +1,7 @@
 package cn.linkedcare.springboot.token.timer;
 
 import java.util.Calendar;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -13,6 +14,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.omg.CORBA.Current;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -51,33 +53,35 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 	
 	public static final Logger logger = LoggerFactory.getLogger(TokenTimer.class);
 	
-	private static Map<ITokenManage,ITokenManage> map = new HashMap<ITokenManage,ITokenManage>();
 	//分片总数
 	public static final int SHARDING_TOTAL = 1;
 	
 	@Value("${zookeeper.url}")
 	private String zkUrl;
-	
-	private  static Executor executor = null;
+
+	private Map<ITokenManage,ITokenManage> map = new HashMap<ITokenManage,ITokenManage>();
+
+	private Executor executor = Executors.newFixedThreadPool( Runtime.getRuntime().availableProcessors()*2);
 
 	private void refreshToken(){
-		
+	
 		CountDownLatch cdl = new CountDownLatch(map.size());
 
 		logger.info("start 1 refreshToken.....{}",map.size());
 
 		for(ITokenManage tokenManage:map.values()){
-			
 			executor.execute(new TokenThread(tokenManage,cdl));
 		}
-		logger.info("start 2 refreshToken.....{}",System.currentTimeMillis());
+		
+		long now  = System.currentTimeMillis();
+		logger.info("start 2 refreshToken.....{}",now);
 		try {//最多阻塞10分钟
 			cdl.await(10,TimeUnit.MINUTES);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		logger.info("end 3 refreshToken.....{}",System.currentTimeMillis());
+		logger.info("end 3 refreshToken.....{}",System.currentTimeMillis()-now);
 	}
 	
     private  CoordinatorRegistryCenter createRegistryCenter() {
@@ -102,9 +106,7 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 
 	@Override
 	public void execute(ShardingContext context) {
-		context.getShardingItem();
 		logger.info("token begin ...:{},{}",context.getJobName(),context.getShardingItem());
-		
 		refreshToken();
 		logger.info("token end   ...:{},{}",context.getJobName(),context.getShardingItem());
 	}
@@ -152,10 +154,8 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 	public void onApplicationEvent(SpringApplicationEvent event) {
 		
 		if(event instanceof ApplicationReadyEvent){
-			logger.info("onApplicationEvent:========================");
+			logger.info("onApplicationEvent:========================,{}",map.size());
 			
-			
-			executor = Executors.newFixedThreadPool(map.size());
 			//先刷新的token
 			refreshToken();
 			//再定时刷新token

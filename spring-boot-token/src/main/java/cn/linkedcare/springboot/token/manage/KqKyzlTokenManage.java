@@ -119,7 +119,7 @@ public class KqKyzlTokenManage implements ITokenManage{
 			redisTemplate.setex(TOKEN_PRE+KqKyzlTokenManage.class.getName(),expireTime,token);
 			
 			
-			nextTimeOut = now + tokenRes.getExpires_in() - 300;
+			nextTimeOut = now + tokenRes.getExpires_in() - TIME_OUT;
 			
 			log.info("refreshToken:{},{}",JSON.toJSONString(tokenRes),nextTimeOut);
 		} catch (IOException e) {

@@ -46,8 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @Order
 public class ZkRefreshTask implements BeanPostProcessor,ApplicationListener<SpringApplicationEvent>{
 	
-	private Map<String,List<AbstractCacheRefresh>> cacheRefreshsMap
-			= new HashMap<String,List<AbstractCacheRefresh>>();
+	private Map<String,List<AbstractCacheRefresh>> cacheRefreshsMap	= new HashMap<String,List<AbstractCacheRefresh>>();
 	
 	
 	
@@ -57,27 +56,30 @@ public class ZkRefreshTask implements BeanPostProcessor,ApplicationListener<Spri
 	
 	@Override
 	public void onApplicationEvent(SpringApplicationEvent event) {
-		
+		ZkLeaderShip zkLeaderShip = null;
 		if(event instanceof ApplicationReadyEvent){
+			log.info("ZkRefreshTask:{}",cacheRefreshsMap.size());
+			
 			for(String key:cacheRefreshsMap.keySet()) {
+				log.info("ZkRefreshTask:{}",key);
+
 				RetryPolicy retryPolicy = new ExponentialBackoffRetry(10000,Integer.MAX_VALUE);
 				CuratorFramework client = CuratorFrameworkFactory.newClient(CacheConstant.getZkUrl(), retryPolicy);
 				
-				//初始化所有相关数据
-				for(AbstractCacheRefresh abstractCacheRefresh:cacheRefreshsMap.get(key)){
-					abstractCacheRefresh.abstractCache(); 
-				}	
-				
-				client.start();
 				try {
+					//连接启动
+					client.start();
 					client.blockUntilConnected();
-					ZkLeaderShip zkLeaderShip = new ZkLeaderShip(client,ZK_PATH+key,cacheRefreshsMap.get(key));
+					log.info("ZkRefreshTask zk connect");
+					
+					zkLeaderShip = new ZkLeaderShip(client,ZK_PATH+key,cacheRefreshsMap.get(key));
 					zkLeaderShip.start();
 				} catch (InterruptedException | IOException e) {
 					e.printStackTrace();
 					throw new RuntimeException(e);
 				}
 			}
+			log.info("ZkRefreshTask end");			
 		}
 	}
 

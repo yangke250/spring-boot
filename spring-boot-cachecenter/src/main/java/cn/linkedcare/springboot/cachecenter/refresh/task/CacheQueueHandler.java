@@ -27,9 +27,9 @@ public class CacheQueueHandler {
 			public void run() {
 				while(true) {
 					try {
-						AbstractCacheRefresh cacheResh = queue.poll(60,TimeUnit.SECONDS);
-						log.info("cacheResh:{}",cacheResh);
+						AbstractCacheRefresh cacheResh = queue.poll(60,TimeUnit.MINUTES);
 						if(cacheResh!=null) {
+							log.info("cacheResh:{}",cacheResh);
 							cacheResh.abstractCache();
 						}
 					}catch(Exception e) {

@@ -3,6 +3,8 @@ package cn.linkedcare.springboot.cachecenter.refresh.task;
 import java.util.List;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -12,6 +14,7 @@ import cn.linkedcare.springboot.cachecenter.refresh.AbstractCacheRefresh;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
+@Slf4j
 public class CacheTimeWheel {
 	@Data
 	public static class TaskDto{
@@ -67,23 +70,30 @@ public class CacheTimeWheel {
 	
 	public void start() throws InterruptedException {
 		while(true) {
-			CopyOnWriteArrayList<TaskDto> list = wheelList.get(current);
-			
-			for(TaskDto t:list) {
-				if(t.count==0) {
-					CacheQueueHandler.add(t.getT());
-					
-					add(t.getT(),t.getCount());
-				}else {
-					t.setCount(t.getCount()-1);
+			try{
+				CopyOnWriteArrayList<TaskDto> list = wheelList.get(current);
+				
+				for(TaskDto t:list) {
+					if(t.count==0) {
+						CacheQueueHandler.add(t.getT());
+						
+						add(t.getT(),t.getCount());
+					}else {
+						t.setCount(t.getCount()-1);
+					}
 				}
+				//当时间轮超过上限的时候，
+				current++;
+				if(current>=60) {
+					current=0;
+				}
+			
+				Thread.sleep(1000l);
+			}catch(Exception e){
+				e.printStackTrace();
+				log.error(e.getMessage(),e);
 			}
-			//当时间轮超过上限的时候，
-			current++;
-			if(current>=60) {
-				current=0;
-			}
-			Thread.sleep(1000l);
+			
 		}
 	}
 

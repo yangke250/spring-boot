@@ -138,8 +138,8 @@ public class KqOpenApiTokenManage implements ITokenManage{
 			
 			redisTemplate.setex(TOKEN_PRE+KqOpenApiTokenManage.class.getName(),expiredTime,token);
 			
-			//提前10分钟刷新
-			nextTimeOut = now + expiredTime - 600;
+			//提前刷新
+			nextTimeOut = now + expiredTime - TIME_OUT;
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.error("exception:{}", e);

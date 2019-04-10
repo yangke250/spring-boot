@@ -11,6 +11,7 @@ import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
 
 import cn.linkedcare.springboot.cachecenter.refresh.AbstractCacheRefresh;
+import cn.linkedcare.springboot.cachecenter.refresh.task.CacheQueueHandler;
 import cn.linkedcare.springboot.cachecenter.refresh.task.CacheTimeWheel;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,9 +46,11 @@ public class ZkLeaderShip extends LeaderSelectorListenerAdapter implements Close
     		try {
     			//添加待刷新的任务
         		cacheTimeWheel.add(cacheRefresh,cacheRefresh.refreshTime());
-        	}catch(Exception e) {
-        		e.printStackTrace();
         		
+        		//先刷新
+				CacheQueueHandler.add(cacheRefresh);
+    		}catch(Exception e) {
+        		e.printStackTrace();
         		log.error("exception:",e);
         	}
     	}
