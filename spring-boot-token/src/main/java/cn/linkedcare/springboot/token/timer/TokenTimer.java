@@ -70,7 +70,7 @@ public class TokenTimer implements SimpleJob,BeanPostProcessor,ApplicationListen
 		logger.info("start 1 refreshToken.....{}",map.size());
 
 		for(ITokenManage tokenManage:map.values()){
-			executor.execute(new TokenThread(tokenManage,cdl));
+			new Thread(new TokenThread(tokenManage,cdl)).start();
 		}
 		
 		long now  = System.currentTimeMillis();
