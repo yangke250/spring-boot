@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -58,6 +59,12 @@ public class HttpSessionInterceptor  implements HandlerInterceptor{
 	 * @return
 	 */
 	private boolean isJWTToken(HttpServletRequest request){
+		String uri = request.getRequestURI();
+		//此方法不做拦截
+		if(uri.contains("getJWTCode")) {
+			return false;
+		}
+		
 		String token = request.getHeader(AUTH);
 		if(token==null){
 			return false;
