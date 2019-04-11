@@ -66,8 +66,8 @@ public class KqOpenApiTokenManage implements ITokenManage{
 	}
 
 	private static OkHttpClient client = new OkHttpClient.Builder()
-			.connectTimeout(2, TimeUnit.SECONDS)
-			.readTimeout(2, TimeUnit.SECONDS)
+			.connectTimeout(5, TimeUnit.SECONDS)
+			.readTimeout(5, TimeUnit.SECONDS)
 			.addInterceptor(new RetryIntercepter(2))
 			.build();
 

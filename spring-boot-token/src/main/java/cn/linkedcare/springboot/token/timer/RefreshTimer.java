@@ -44,7 +44,7 @@ public class RefreshTimer implements BeanPostProcessor, ApplicationListener<Spri
 
 	private static List<ITokenManage> list = new ArrayList<ITokenManage>();
 
-	public static final String ZK_PATH = "/linkedcare/tokenTask/";
+	public static final String ZK_PATH = "/linkedcare/tokenTask";
 
 	@Value("${zookeeper.url}")
 	private String zkUrl;
