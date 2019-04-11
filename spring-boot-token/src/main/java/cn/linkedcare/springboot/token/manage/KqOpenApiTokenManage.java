@@ -50,9 +50,6 @@ public class KqOpenApiTokenManage implements ITokenManage{
 	private static String openUrl;
 	private static RedisTemplate redisTemplate;
 	
-	public static final void main(String[] args) {
-		System.out.print(MediaType.get(MEDIA_TYPE));
-	}
 	
 	public static String getOpenUrl() {
 		return openUrl;
@@ -108,14 +105,10 @@ public class KqOpenApiTokenManage implements ITokenManage{
 	 * @return
 	 */
 	public  void refreshToken() {
+		//现在时间要除去1000
 		long now = System.currentTimeMillis() / 1000;
 
 		log.info("refreshToken open:{},{}",now,nextTimeOut);
-
-		if (now < nextTimeOut) {
-			return;
-		}
-
 
 		TokenLogin tokenLogin = new TokenLogin.TokenLoginBuilder()
 		.tenantId(KqTokenConstant.getOldTokenTenantId())
@@ -142,7 +135,7 @@ public class KqOpenApiTokenManage implements ITokenManage{
 			redisTemplate.setex(TOKEN_PRE+KqOpenApiTokenManage.class.getName(),expiredTime,token);
 			
 			//提前刷新
-			nextTimeOut = now + expiredTime - TIME_OUT;
+			nextTimeOut = now + expiredTime;
 			
 			log.info("refreshToken open:{},{}",JSON.toJSONString(tokenRes),nextTimeOut);
 
@@ -158,10 +151,17 @@ public class KqOpenApiTokenManage implements ITokenManage{
 		try {
 			lock.readLock().lock();
 			String token = redisTemplate.get(TOKEN_PRE+KqOpenApiTokenManage.class.getName());
+			
+			log.info("getToken open:{}",token);
 			return token;
 		} finally {
 			lock.readLock().unlock();
 		}
 
+	}
+
+	@Override
+	public long nextTimeOut() {
+		return nextTimeOut;
 	}
 }

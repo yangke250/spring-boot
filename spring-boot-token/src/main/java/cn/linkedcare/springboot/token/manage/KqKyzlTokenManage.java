@@ -87,13 +87,12 @@ public class KqKyzlTokenManage implements ITokenManage{
 	 * @return
 	 */
 	public void refreshToken() {
+		//现在时间要除去1000
 		long now = System.currentTimeMillis() / 1000;
 
 		log.info("refreshToken:{},{}",now,nextTimeOut);
 
-		if (now < nextTimeOut) {
-			return;
-		}
+		
 
 		String token = "Basic " + Base64.getEncoder().encodeToString(
 				(KqTokenConstant.getTokenUsername() + ":" + KqTokenConstant.getTokenPassword()).getBytes());
@@ -116,14 +115,11 @@ public class KqKyzlTokenManage implements ITokenManage{
 			// 提前5分钟刷新token
 			token = BEARER+tokenRes.getAccess_token();
 			
-			int expireTime = (int) tokenRes.getExpires_in();
+			int expireTime = (int) tokenRes.getExpires_in();//超时时间
 			
 			redisTemplate.setex(TOKEN_PRE+KqKyzlTokenManage.class.getName(),expireTime,token);
 			
-			
-			nextTimeOut = now + expireTime - TIME_OUT;
-			
-			log.info("refreshToken: end {}",redisTemplate.get(TOKEN_PRE+KqKyzlTokenManage.class.getName()));
+			nextTimeOut = now + expireTime;
 			log.info("refreshToken:{},{}",JSON.toJSONString(tokenRes),nextTimeOut);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -133,19 +129,20 @@ public class KqKyzlTokenManage implements ITokenManage{
 		}
 	}
 
-	
-	public static void main(String[] args) {
-		System.out.print(KqKyzlTokenManage.class.getName());
+
+	@Override
+	public long nextTimeOut() {
+		return nextTimeOut;
 	}
+	
 
 	public static String getToken() {
-		String token =null;
-		
 		try {
 			lock.readLock().lock();
-			token = redisTemplate.get(TOKEN_PRE+KqKyzlTokenManage.class.getName());
-			log.info("getToken KqTokenManage:{}",token);
-
+			
+			String token = redisTemplate.get(TOKEN_PRE+KqKyzlTokenManage.class.getName());
+			log.info("getToken kyzl:{}",token);
+			
 			return token;
 		} finally {
 			lock.readLock().unlock();
@@ -153,4 +150,6 @@ public class KqKyzlTokenManage implements ITokenManage{
 		}
 
 	}
+
+	
 }
