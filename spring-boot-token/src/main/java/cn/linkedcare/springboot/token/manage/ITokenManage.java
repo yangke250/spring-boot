@@ -13,7 +13,7 @@ public interface ITokenManage {
 	
 	public static final int TIME_OUT=60*20;//超时时间
 	
-	public static final String TOKEN_PRE="springboot_token_";
+	public static final String TOKEN_PRE="springboot_token_new";
 	
 	
 	

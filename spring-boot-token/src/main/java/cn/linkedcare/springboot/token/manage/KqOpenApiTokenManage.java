@@ -139,7 +139,7 @@ public class KqOpenApiTokenManage implements ITokenManage{
 			
 			int expiredTime = (int) (getNextExpiredTime(tokenRes.getExpiredTime())/1000);
 			
-			redisTemplate.set(TOKEN_PRE+KqOpenApiTokenManage.class.getName(),token);
+			redisTemplate.setex(TOKEN_PRE+KqOpenApiTokenManage.class.getName(),expiredTime,token);
 			
 			//提前刷新
 			nextTimeOut = now + expiredTime - TIME_OUT;
