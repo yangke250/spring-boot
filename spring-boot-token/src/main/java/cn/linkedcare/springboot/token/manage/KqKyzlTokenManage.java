@@ -18,6 +18,7 @@ import com.sun.media.jfxmedia.logging.Logger;
 import cn.linkedcare.springboot.redis.template.RedisTemplate;
 import cn.linkedcare.springboot.token.constant.KqTokenConstant;
 import cn.linkedcare.springboot.token.intercepter.RetryIntercepter;
+import cn.linkedcare.springboot.token.utils.MD5Util;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
@@ -48,6 +49,7 @@ public class KqKyzlTokenManage implements ITokenManage{
 
 	private static RedisTemplate redisTemplate;
 	
+	private static String KY_KEY=TOKEN_PRE+MD5Util.md5(KqKyzlTokenManage.class.getName());
 	
 	
 	public static String getOpenUrl() {
@@ -68,7 +70,6 @@ public class KqKyzlTokenManage implements ITokenManage{
 	private static OkHttpClient client = new OkHttpClient.Builder()
 			.connectTimeout(5, TimeUnit.SECONDS)
 			.readTimeout(5, TimeUnit.SECONDS)
-			.addInterceptor(new RetryIntercepter(2))
 			.build();
 
 	@Data
@@ -117,10 +118,10 @@ public class KqKyzlTokenManage implements ITokenManage{
 			
 			int expireTime = (int) tokenRes.getExpires_in();//超时时间
 			
-			redisTemplate.setex(TOKEN_PRE+KqKyzlTokenManage.class.getName(),expireTime,token);
+			redisTemplate.setex(KY_KEY,expireTime,token);
 			
 			nextTimeOut = now + expireTime;
-			log.info("refreshToken:{},{}",JSON.toJSONString(tokenRes),nextTimeOut);
+			log.info("refreshToken:{},{}",KY_KEY,token,nextTimeOut);
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.error("exception:{}", e);
@@ -140,8 +141,8 @@ public class KqKyzlTokenManage implements ITokenManage{
 		try {
 			lock.readLock().lock();
 			
-			String token = redisTemplate.get(TOKEN_PRE+KqKyzlTokenManage.class.getName());
-			log.info("getToken kyzl:{}",token);
+			String token = redisTemplate.get(KY_KEY);
+			log.info("getToken kyzl:{},{}",KY_KEY,token);
 			
 			return token;
 		} finally {

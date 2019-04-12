@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSON;
 import cn.linkedcare.springboot.redis.template.RedisTemplate;
 import cn.linkedcare.springboot.token.constant.KqTokenConstant;
 import cn.linkedcare.springboot.token.intercepter.RetryIntercepter;
+import cn.linkedcare.springboot.token.utils.MD5Util;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import sun.security.provider.MD5;
 
 /**
  * 口腔openApi的token
@@ -50,6 +52,7 @@ public class KqOpenApiTokenManage implements ITokenManage{
 	private static String openUrl;
 	private static RedisTemplate redisTemplate;
 	
+	private static final String OPEN_KEY = TOKEN_PRE+MD5Util.md5(KqOpenApiTokenManage.class.getName());
 	
 	public static String getOpenUrl() {
 		return openUrl;
@@ -68,7 +71,6 @@ public class KqOpenApiTokenManage implements ITokenManage{
 	private static OkHttpClient client = new OkHttpClient.Builder()
 			.connectTimeout(5, TimeUnit.SECONDS)
 			.readTimeout(5, TimeUnit.SECONDS)
-			.addInterceptor(new RetryIntercepter(2))
 			.build();
 
 	@Data
@@ -132,12 +134,12 @@ public class KqOpenApiTokenManage implements ITokenManage{
 			
 			int expiredTime = (int) (getNextExpiredTime(tokenRes.getExpiredTime())/1000);
 			
-			redisTemplate.setex(TOKEN_PRE+KqOpenApiTokenManage.class.getName(),expiredTime,token);
+			redisTemplate.setex(OPEN_KEY,expiredTime,token);
 			
 			//提前刷新
 			nextTimeOut = now + expiredTime;
 			
-			log.info("refreshToken open:{},{}",JSON.toJSONString(tokenRes),nextTimeOut);
+			log.info("refreshToken open:{}:{},{}",OPEN_KEY,token,nextTimeOut);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -150,9 +152,9 @@ public class KqOpenApiTokenManage implements ITokenManage{
 	public static String getToken() {
 		try {
 			lock.readLock().lock();
-			String token = redisTemplate.get(TOKEN_PRE+KqOpenApiTokenManage.class.getName());
+			String token = redisTemplate.get(OPEN_KEY);
 			
-			log.info("getToken open:{}",token);
+			log.info("getToken open:{},{}",OPEN_KEY,token);
 			return token;
 		} finally {
 			lock.readLock().unlock();
