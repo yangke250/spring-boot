@@ -28,7 +28,7 @@ public abstract class AbstractCacheRefresh<T> implements ICacheRefresh<T>{
 	private ParameterizedType p;
 	
 	public Class<T> getTClass() {
-        return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+		return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 	
 	

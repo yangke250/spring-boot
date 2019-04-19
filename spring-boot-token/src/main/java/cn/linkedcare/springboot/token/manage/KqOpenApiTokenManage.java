@@ -54,6 +54,10 @@ public class KqOpenApiTokenManage implements ITokenManage{
 	
 	private static final String OPEN_KEY = TOKEN_PRE+MD5Util.md5(KqOpenApiTokenManage.class.getName());
 	
+	public static void main(String[] args){
+		System.out.println(OPEN_KEY);
+	}
+	
 	public static String getOpenUrl() {
 		return openUrl;
 	}

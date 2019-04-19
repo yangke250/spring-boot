@@ -51,6 +51,9 @@ public class KqKyzlTokenManage implements ITokenManage{
 	
 	private static String KY_KEY=TOKEN_PRE+MD5Util.md5(KqKyzlTokenManage.class.getName());
 	
+	public static void main(String[] args){
+		System.out.println(KY_KEY);
+	}
 	
 	public static String getOpenUrl() {
 		return openUrl;

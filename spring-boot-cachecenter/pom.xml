@@ -40,7 +40,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>spring-boot-portal</finalName>
+		<finalName>spring-boot-cachecenter</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<resources>
 			<!-- 控制资源文件的拷贝 -->

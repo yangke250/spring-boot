@@ -71,6 +71,10 @@ public class ValidateInterceptor {
 			ValidateResult result  = doValidate(o,as[i]);
 			if(!result.isResult()){
 				HttpServletResponse response = BrowserCacheAop.getResponse();
+				
+				response.setCharacterEncoding("utf-8");
+				response.setContentType("application/json;charset=utf-8");
+				
 				response.getWriter().write("{\"msg\":\""+result.getMsg()+"\",\"result\":400}");
 				return null;
 			}
