@@ -17,13 +17,14 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
-				<groupId>org.apache.hbase</groupId>
-				<artifactId>hbase-client</artifactId>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-client</artifactId>
 		</dependency>
 		<dependency>
-				<groupId>org.apache.hbase</groupId>
-				<artifactId>hbase-common</artifactId>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase-common</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>jdk.tools</groupId>
 			<artifactId>jdk.tools</artifactId>
