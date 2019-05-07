@@ -50,7 +50,6 @@ public class Launch {
 		return cac.getBean(classz);
 	}
 	
-	
 	private static HbaseTemplate hbaseTemplate;
 	
 	@Resource
@@ -64,7 +63,7 @@ public class Launch {
 		Scan scan = new Scan();
 		scan.addColumn("address".getBytes(),"city".getBytes());
 		scan.addColumn("address".getBytes(),"contry".getBytes());
-		
+	
 		hbaseTemplate.find("member", scan,new RowMapper<String>(){
 
 			@Override
