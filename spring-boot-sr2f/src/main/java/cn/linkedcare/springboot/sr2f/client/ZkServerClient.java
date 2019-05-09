@@ -18,31 +18,36 @@ import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.RetryNTimes;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 
 import cn.linkedcare.springboot.sr2f.config.Sr2fConfig;
 import cn.linkedcare.springboot.sr2f.dto.ServerDto;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * zk客户端,监听数据的变化
  * @author wl
  *
  */
-public class ZkServerClient implements BeanPostProcessor{
+@Slf4j
+public class ZkServerClient {
 
 
-	private  CuratorFramework client = null;  
-
+	private List<IServerClient> serversClients = new ArrayList<IServerClient>();
 	
-	public ZkServerClient(String path){
-		init(path);
+	
+	public ZkServerClient(List<IServerClient> serversClients){
+		this.serversClients = serversClients;
 	}
+
 	
 
 	
-	private void notifyChange(String path){
+	private void notifyChange(CuratorFramework client,String path){
 		try {
 			List<String> datas = client.getChildren().forPath(path);
 			
@@ -51,21 +56,21 @@ public class ZkServerClient implements BeanPostProcessor{
 				servers.add(JSON.parseObject(data,ServerDto.class));
 			}
 			
-			List<IServerClient>  list = ServerClientMonitor.getServerList();
-	    	for(IServerClient  l:list){
+	    	for(IServerClient  l:serversClients){
 	    		l.changeNotify(servers);
 	    		
 	    	}
 		} catch (Exception e) {
 			e.printStackTrace();
-			
+			log.info("exception:",e);
+			throw new RuntimeException(e);
 		}
     	
 	}
     /**
      * 增加子节点变化的监控
      */
-    private void addDataChangeListener(String path){
+    private void addDataChangeListener(CuratorFramework client,String path){
    	    PathChildrenCache cache = new PathChildrenCache(client,path, false);  
         try {
 			cache.start();
@@ -79,11 +84,11 @@ public class ZkServerClient implements BeanPostProcessor{
                     PathChildrenCacheEvent event) throws Exception {  
                 switch (event.getType()) {  
                 	case CHILD_ADDED: {  
-                		notifyChange(path);
+                		notifyChange(client,path);
                 		break;  
                 	}
                 	case CHILD_REMOVED: {  
-                    	notifyChange(path);
+                    	notifyChange(client,path);
                 		break;  
                 	}  
                 }  
@@ -94,9 +99,7 @@ public class ZkServerClient implements BeanPostProcessor{
 	
 	public void init(String path){
 
-		// TODO Auto-generated method stub
-
-    	client = CuratorFrameworkFactory.builder().connectString(Sr2fConfig.getZkUrl())  
+		CuratorFramework client = CuratorFrameworkFactory.builder().connectString(Sr2fConfig.getZkUrl())  
                 .sessionTimeoutMs(60000)  
                 .retryPolicy(new RetryNTimes(Integer.MAX_VALUE,10000)).build();  
         // 客户端注册监听，进行连接配置  
@@ -109,16 +112,10 @@ public class ZkServerClient implements BeanPostProcessor{
 			throw new RuntimeException(e);
 		}
     
-        addDataChangeListener(path);
+        addDataChangeListener(client,path);
 	}
 
-	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		return bean;
-	}
 
-	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		return bean;
-	} 
+
+
 }

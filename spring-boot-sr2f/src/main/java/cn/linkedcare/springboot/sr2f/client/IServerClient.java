@@ -10,6 +10,12 @@ import cn.linkedcare.springboot.sr2f.dto.ServerDto;
  *
  */
 public interface IServerClient {
+	
+	/**
+	 * 监听相关的path
+	 * @return
+	 */
+	public String path();
 
 	/**
 	 * 
