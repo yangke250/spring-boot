@@ -48,7 +48,7 @@ public class ServerClientMonitor implements BeanPostProcessor,ApplicationListene
 			for(String key:map.keySet()){
 				List<IServerClient> servers = map.get(key);
 				
-				ZkServerClient zc = new ZkServerClient(servers);
+				ZkServerClient zc = new ZkServerClient(key,servers);
 			}
 		}
 	} 

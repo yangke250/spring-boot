@@ -35,14 +35,53 @@ public class Sr2fConfig {
 	
 	private static String zkUrl;
 
+	private static String path;
+	
+	private static boolean isServer;
+	
+	private static boolean isClient;
+	
+	private static int port;
+	
 	public static String getZkUrl() {
 		return zkUrl;
 	}
+	public static String getPath() {
+		return path;
+	}
+	public static boolean isServer() {
+		return isServer;
+	}
+	public static boolean isClient() {
+		return isClient;
+	}
+	public static int getPort() {
+		return port;
+	}
 
-	@Value("${zookeeper.url}")
+	
+	
+	@Value("${sr2f.zookeeper.url}")
 	public void setZkUrl(String zkUrl) {
 		Sr2fConfig.zkUrl = zkUrl;
 	}
+	@Value("${sr2f.path}")
+	public void setPath(String path) {
+		Sr2fConfig.path = path;
+	}
+	@Value("${sr2f.server}")
+	public void setServer(boolean isServer) {
+		Sr2fConfig.isServer = isServer;
+	}
+	@Value("${sr2f.client}")
+	public void setClient(boolean isClient) {
+		Sr2fConfig.isClient = isClient;
+	}
+	@Value("${sr2f.port}")
+	public void setPort(int port) {
+		Sr2fConfig.port = port;
+	}
 
+	
 
 }

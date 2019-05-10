@@ -1,7 +1,9 @@
 package cn.linkedcare.springboot.sr2f.server;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.curator.framework.CuratorFramework;
@@ -13,35 +15,39 @@ import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import cn.linkedcare.springboot.sr2f.config.Sr2fConfig;
 
 
+
 public class ZkServerRegister  extends AbstractServerRegister{
-	  
-    public ZkServerRegister(String path, int port) {
-		super(path, port);
+	
+	private CuratorFramework client;
+ 
+	@Override
+	public void destory(){
+		if(client!=null){
+			client.close();
+		}
 	}
-
-
-	private  CuratorFramework client = null;  
-  
-    
     
     
     @Override
-	public void init(String path, String json) {
+	public void init() {
 		// TODO Auto-generated method stub
 
-    	client = CuratorFrameworkFactory.builder().connectString(Sr2fConfig.getZkUrl())  
+    	String json = super.getJson();
+    	
+    	CuratorFramework client = CuratorFrameworkFactory.builder().connectString(Sr2fConfig.getZkUrl())  
                 .sessionTimeoutMs(60000)  
                 .retryPolicy(new RetryNTimes(Integer.MAX_VALUE,10000)).build();  
-        client.getConnectionStateListenable().addListener((CuratorFramework client, ConnectionState newState)->{
+        client.getConnectionStateListenable().addListener((CuratorFramework cf, ConnectionState newState)->{
         	
         	if(ConnectionState.CONNECTED==newState){
-        		addNodeToZk(path,json);
+        		addNodeToZk(cf,super.getPath(),json);
         	}else if(ConnectionState.RECONNECTED==newState){
-        		addNodeToZk(path,json);
+        		addNodeToZk(cf,super.getPath(),json);
         	}
         });
         // 客户端注册监听，进行连接配置  
@@ -60,17 +66,16 @@ public class ZkServerRegister  extends AbstractServerRegister{
      * 添加指定的节点
      * @param path
      */
-    public void addNodeToZk(String path,String json){
+    private void addNodeToZk(CuratorFramework client,String path,String json){
     	PersistentNode node = new PersistentNode(client,
     			CreateMode.EPHEMERAL,
     			false,
-    			path,
+    			path+"/"+UUID.randomUUID().toString(),
     			json.getBytes());
     	node.start();
     }
 
 
 	
-   
 
 }

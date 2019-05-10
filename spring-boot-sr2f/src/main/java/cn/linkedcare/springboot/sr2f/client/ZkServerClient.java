@@ -40,8 +40,10 @@ public class ZkServerClient {
 	private List<IServerClient> serversClients = new ArrayList<IServerClient>();
 	
 	
-	public ZkServerClient(List<IServerClient> serversClients){
+	public ZkServerClient(String path,List<IServerClient> serversClients){
 		this.serversClients = serversClients;
+		
+		init(path);
 	}
 
 	
