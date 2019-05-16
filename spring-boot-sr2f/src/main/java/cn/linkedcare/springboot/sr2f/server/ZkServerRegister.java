@@ -18,13 +18,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import cn.linkedcare.springboot.sr2f.config.Sr2fConfig;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 
 
+@Component
+@Slf4j
 public class ZkServerRegister  extends AbstractServerRegister{
 	
 	private CuratorFramework client;
  
+	
 	@Override
 	public void destory(){
 		if(client!=null){
@@ -33,9 +38,15 @@ public class ZkServerRegister  extends AbstractServerRegister{
 	}
     
     
-    @Override
+    @PostConstruct
+	@Override
 	public void init() {
-		// TODO Auto-generated method stub
+    	boolean isServer = Sr2fConfig.isServer();
+    	log.info("server status:{}",isServer);
+    	if(!isServer){
+    		return;
+    	}
+    	
 
     	String json = super.getJson();
     	

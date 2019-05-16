@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class ServerClientMonitor implements BeanPostProcessor,ApplicationListener<ApplicationEvent>{
+public class Sr2fClientMonitor implements BeanPostProcessor,ApplicationListener<ApplicationEvent>{
 
 
-	private static Map<String,List<IServerClient>> map = new HashMap<String,List<IServerClient>>();
+	private static Map<String,List<ISr2fClient>> map = new HashMap<String,List<ISr2fClient>>();
 	
 	
 
@@ -28,11 +28,11 @@ public class ServerClientMonitor implements BeanPostProcessor,ApplicationListene
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		if(bean instanceof IServerClient){
-			IServerClient sc = (IServerClient)bean;
-			List<IServerClient> scs = map.get(sc.path()); 
+		if(bean instanceof ISr2fClient){
+			ISr2fClient sc = (ISr2fClient)bean;
+			List<ISr2fClient> scs = map.get(sc.path()); 
 			if(scs==null){
-				scs = new ArrayList<IServerClient>(); 
+				scs = new ArrayList<ISr2fClient>(); 
 				map.put(sc.path(),scs);
 			}
 			
@@ -46,9 +46,9 @@ public class ServerClientMonitor implements BeanPostProcessor,ApplicationListene
 	public void onApplicationEvent(ApplicationEvent event) {
 		if(event instanceof ApplicationStartedEvent){
 			for(String key:map.keySet()){
-				List<IServerClient> servers = map.get(key);
+				List<ISr2fClient> servers = map.get(key);
 				
-				ZkServerClient zc = new ZkServerClient(key,servers);
+				ZkClient zc = new ZkClient(key,servers);
 			}
 		}
 	} 

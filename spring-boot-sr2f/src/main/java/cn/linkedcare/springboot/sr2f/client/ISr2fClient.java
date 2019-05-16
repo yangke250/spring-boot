@@ -9,7 +9,7 @@ import cn.linkedcare.springboot.sr2f.dto.ServerDto;
  * @author wl
  *
  */
-public interface IServerClient {
+public interface ISr2fClient {
 	
 	/**
 	 * 监听相关的path

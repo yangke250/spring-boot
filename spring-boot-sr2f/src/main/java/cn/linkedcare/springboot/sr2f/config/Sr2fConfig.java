@@ -73,14 +73,15 @@ public class Sr2fConfig {
 	public void setServer(boolean isServer) {
 		Sr2fConfig.isServer = isServer;
 	}
-	@Value("${sr2f.client}")
-	public void setClient(boolean isClient) {
-		Sr2fConfig.isClient = isClient;
-	}
 	@Value("${sr2f.port}")
 	public void setPort(int port) {
 		Sr2fConfig.port = port;
 	}
+	@Value("${sr2f.client}")
+	public void setClient(boolean isClient) {
+		Sr2fConfig.isClient = isClient;
+	}
+	
 
 	
 

@@ -48,8 +48,8 @@ public abstract class AbstractServerRegister {
 		String password = UUID.randomUUID().toString();
 		this.password = password;
 		
-		this.path = Sr2fConfig.getPath();
-		
 		this.port = Sr2fConfig.getPort();
+
+		this.path = Sr2fConfig.getPath();
 	}
 }
