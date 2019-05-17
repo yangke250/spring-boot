@@ -12,6 +12,9 @@ import lombok.Data;
 @Data
 public abstract class AbstractServerRegister {
 
+	
+	public static final String SPLIT=":";
+	
 	/**
 	 * 初始化
 	 * @param path
@@ -34,9 +37,8 @@ public abstract class AbstractServerRegister {
 	
 	public String getJson(){
 		ServerDto serverDto = new ServerDto();
-		serverDto.setIp(ip);
+		serverDto.setConnectServer(ip+SPLIT+port);
 		serverDto.setPassword(password);
-		serverDto.setPort(port);
 		
 		return JSON.toJSONString(serverDto);
 	}

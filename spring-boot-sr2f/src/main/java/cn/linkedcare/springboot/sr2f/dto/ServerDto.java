@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class ServerDto {
-	private String  ip;
-	private int port;
+	private String connectServer;
 	private String password;
 }
