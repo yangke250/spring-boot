@@ -56,9 +56,9 @@ public class ZkServerRegister  extends AbstractServerRegister{
         client.getConnectionStateListenable().addListener((CuratorFramework cf, ConnectionState newState)->{
         	
         	if(ConnectionState.CONNECTED==newState){
-        		addNodeToZk(cf,super.getPath(),json);
+        		addNodeToZk(cf,AbstractServerRegister.getPath(),json);
         	}else if(ConnectionState.RECONNECTED==newState){
-        		addNodeToZk(cf,super.getPath(),json);
+        		addNodeToZk(cf,AbstractServerRegister.getPath(),json);
         	}
         });
         // 客户端注册监听，进行连接配置  

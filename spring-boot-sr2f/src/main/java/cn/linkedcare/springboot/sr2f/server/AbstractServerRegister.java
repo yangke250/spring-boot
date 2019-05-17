@@ -13,7 +13,6 @@ import lombok.Data;
 public abstract class AbstractServerRegister {
 
 	
-	public static final String SPLIT=":";
 	
 	/**
 	 * 初始化
@@ -27,31 +26,42 @@ public abstract class AbstractServerRegister {
 	 */
 	public  abstract void destory();
 	
-	private String ip;
+	private static String ip;
 	
-	private String password;
+	private static String password;
 	
-	private String path;
+	private static String path;
 	
-	private int port;
+	private static int port;
 	
-	public String getJson(){
+	public static String getConnectServer(){
+		return ip+ServerDto.SPLIT+port;
+	}
+	
+	public static String getJson(){
 		ServerDto serverDto = new ServerDto();
-		serverDto.setConnectServer(ip+SPLIT+port);
+		serverDto.setConnectServer(ip+ServerDto.SPLIT+port);
 		serverDto.setPassword(password);
 		
 		return JSON.toJSONString(serverDto);
 	}
 	
 	public AbstractServerRegister(){
-		String ip = IPUtils.getIp();
-		this.ip = ip;
+		AbstractServerRegister.ip = IPUtils.getIp();
 		
-		String password = UUID.randomUUID().toString();
-		this.password = password;
+		AbstractServerRegister.password = UUID.randomUUID().toString();
 		
-		this.port = Sr2fConfig.getPort();
+		AbstractServerRegister.port = Sr2fConfig.getPort();
 
-		this.path = Sr2fConfig.getPath();
+		AbstractServerRegister.path = Sr2fConfig.getPath();
 	}
+
+	public static String getPath() {
+		return path;
+	}
+
+	
+	
+	
+	
 }
