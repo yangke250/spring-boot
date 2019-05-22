@@ -19,15 +19,11 @@ public class CacheTimeWheel {
 	@Data
 	public static class TaskDto{
 		private int count;//需要遍历几遍时间轮
-		private AbstractCacheRefresh t;
+		private AbstractCacheRefresh<?> t;
 	}
 	
 	private volatile int current = 0;
 	private final int timeWheelSize = 60;
-	private ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
-	private WriteLock wLock = rwLock.writeLock();
-	private ReadLock  rLock = rwLock.readLock();
-	
 	
 	
 	private static List<CopyOnWriteArrayList<TaskDto>> wheelList = 
@@ -40,13 +36,13 @@ public class CacheTimeWheel {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(60/60);
+		System.out.println(86400/60);
 		System.out.println(50%60);
 	}
 	
-	public void add(AbstractCacheRefresh t,int timeout) {
-		try {
-			wLock.lock();
+	
+	
+	public void add(AbstractCacheRefresh<?> t,int timeout) {
 			TaskDto task = new TaskDto();
 			//计算需要几轮
 			int count    = timeout/timeWheelSize;
@@ -58,14 +54,11 @@ public class CacheTimeWheel {
 				position=position-timeWheelSize;
 			}
 			
+			log.info("CacheTimeWheel add: {},{}",t.getClass(),count);
 			task.setCount(count);
 			task.setT(t);
 			
 			wheelList.get(position).add(task);
-		}finally {
-			wLock.unlock();
-		}
-		
 	}
 	
 	public void start() throws InterruptedException {
