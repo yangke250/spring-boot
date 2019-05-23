@@ -18,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class CacheTimeWheel {
 	@Data
 	public static class TaskDto{
-		private int count;//需要遍历几遍时间轮
+		private int count;//需要遍历几遍
 		private AbstractCacheRefresh<?> t;
 	}
 	
@@ -61,6 +61,8 @@ public class CacheTimeWheel {
 			wheelList.get(position).add(task);
 	}
 	
+	
+	
 	public void start() throws InterruptedException {
 		while(true) {
 			try{
@@ -68,9 +70,11 @@ public class CacheTimeWheel {
 				
 				for(TaskDto t:list) {
 					if(t.count==0) {
+						list.remove(t);
+						
 						CacheQueueHandler.add(t.getT());
 						
-						add(t.getT(),t.getCount());
+						add(t.getT(),t.getT().refreshTime());
 					}else {
 						t.setCount(t.getCount()-1);
 					}
