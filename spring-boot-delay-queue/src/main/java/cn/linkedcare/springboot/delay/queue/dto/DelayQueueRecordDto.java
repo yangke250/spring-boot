@@ -8,7 +8,7 @@ import lombok.Data;
 public class DelayQueueRecordDto {
 	private String uid;
 	private String topic;
-	private String value;
+	private String body;
 	private int partition;
 	private long timestamp;
 	
