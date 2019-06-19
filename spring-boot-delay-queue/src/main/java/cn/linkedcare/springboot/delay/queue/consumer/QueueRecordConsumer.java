@@ -1,22 +1,22 @@
-package cn.linkedcare.springboot.delay.queue.listener;
+package cn.linkedcare.springboot.delay.queue.consumer;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 import cn.linkedcare.springboot.delay.queue.dto.ConsumerDto;
 
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.List;
 
 
 
-public class DelayQueueRecordConsumer {
+public class QueueRecordConsumer {
 	
 	private Map<String,ConsumerDto> map = new ConcurrentHashMap<String,ConsumerDto>();
 	
-	public DelayQueueRecordConsumer(List<ConsumerDto> consumerList){
+	public QueueRecordConsumer(List<ConsumerDto> consumerList){
 		initConsumerMap(consumerList);
 		
+		new QueueRecordConsumerPuller().init();
 		
 	}
 	

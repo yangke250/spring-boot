@@ -1,4 +1,4 @@
-package cn.linkedcare.springboot.delay.queue.listener;
+package cn.linkedcare.springboot.delay.queue.consumer;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,7 +12,7 @@ import cn.linkedcare.springboot.delay.queue.dto.DelayQueueRecordDto;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DelayQueueRecordConsumerThread implements Callable<HashSet<DelayQueueRecordDto>> {
+public class QueueRecordConsumerThread implements Callable<HashSet<DelayQueueRecordDto>> {
 
 	private Map<String,ConsumerDto> map; 
 	
@@ -20,7 +20,7 @@ public class DelayQueueRecordConsumerThread implements Callable<HashSet<DelayQue
 	
 	private CountDownLatch cdl = null;
 	
-	public DelayQueueRecordConsumerThread(Map<String,ConsumerDto> map,List<DelayQueueRecordDto> records,CountDownLatch cdl){
+	public QueueRecordConsumerThread(Map<String,ConsumerDto> map,List<DelayQueueRecordDto> records,CountDownLatch cdl){
 		this.map = map;
 		this.records = records;
 		this.cdl = cdl;

@@ -1,4 +1,4 @@
-package cn.linkedcare.springboot.delay.queue.listener;
+package cn.linkedcare.springboot.delay.queue.consumer;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -8,10 +8,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.context.event.ApplicationPreparedEvent;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.annotation.AnnotationUtils;
-
+import org.springframework.stereotype.Component;
 
 import cn.linkedcare.springboot.delay.queue.annotation.DelayQueueListener;
 import cn.linkedcare.springboot.delay.queue.annotation.EnableDelayConsumer;
@@ -19,23 +20,22 @@ import cn.linkedcare.springboot.delay.queue.dto.ConsumerDto;
 import cn.linkedcare.springboot.delay.queue.dto.DelayQueueRecordDto;
 
 /**
- * 监听相关的消费者
- * 
+ * 娑堣垂鑰呯浉鍏冲垵濮嬪寲
  * @author wl
  *
  */
+@Component
 public class InitConsumerListener implements BeanPostProcessor, ApplicationListener<ApplicationEvent> {
 
 	private List<ConsumerDto> consumerList = new CopyOnWriteArrayList<ConsumerDto>();
 
 	public void onApplicationEvent(ApplicationEvent event) {
-		if(event instanceof ApplicationPreparedEvent){
-			new DelayQueueRecordConsumer(consumerList);
+		if(event instanceof ApplicationReadyEvent){
+			new QueueRecordConsumer(consumerList);
 		}
 	}
 
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		// TODO Auto-generated method stub
 		return bean;
 	}
 
