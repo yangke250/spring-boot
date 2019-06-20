@@ -7,20 +7,18 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
-import cn.linkedcare.springboot.delay.queue.dto.ConsumerDto;
+import org.springframework.stereotype.Component;
+
+import cn.linkedcare.springboot.delay.queue.dto.ConsumerMethodDto;
 import cn.linkedcare.springboot.delay.queue.dto.DelayQueueRecordDto;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class QueueRecordConsumerThread implements Callable<HashSet<DelayQueueRecordDto>> {
+@Component
+public class ConsumerMainThread implements Callable<HashSet<DelayQueueRecordDto>> {
 
-	private Map<String,ConsumerDto> map; 
 	
-	private List<DelayQueueRecordDto> records;
-	
-	private CountDownLatch cdl = null;
-	
-	public QueueRecordConsumerThread(Map<String,ConsumerDto> map,List<DelayQueueRecordDto> records,CountDownLatch cdl){
+	public ConsumerMainThread(Map<String,ConsumerMethodDto> map,List<DelayQueueRecordDto> records,CountDownLatch cdl){
 		this.map = map;
 		this.records = records;
 		this.cdl = cdl;
@@ -35,7 +33,7 @@ public class QueueRecordConsumerThread implements Callable<HashSet<DelayQueueRec
 			for(DelayQueueRecordDto record:records){
 				String topic = record.getTopic();
 				
-				ConsumerDto consumer = map.get(topic);
+				ConsumerMethodDto consumer = map.get(topic);
 				if(consumer==null){
 					continue;
 				}

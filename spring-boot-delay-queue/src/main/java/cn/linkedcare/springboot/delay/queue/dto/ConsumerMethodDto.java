@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import lombok.Data;
 
 @Data
-public class ConsumerDto {
+public class ConsumerMethodDto {
 	private Object object;
 	private Method method;
 	private boolean autoCommit;

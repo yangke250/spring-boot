@@ -81,7 +81,7 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 		
 		double score = Double.valueOf(String.valueOf(dto.getTimestamp()));
 		
-		this.redisTemplate.zadd(PRE+dto.getPartition(),score,JSON.toJSONString(dto));
+		this.redisTemplate.zadd(PRE+topic+dto.getPartition(),score,JSON.toJSONString(dto));
 		
 	}
 
