@@ -3,9 +3,10 @@ package cn.linkedcare.springboot.delay.queue.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
 
-
+@Component
 @Configuration
 @PropertySource(
 value = {
@@ -13,7 +14,7 @@ value = {
 		"classpath:application-delay-queue-${spring.profiles.active}.properties"},
 ignoreResourceNotFound = true, encoding = "UTF-8")
 public class DelayQueueConfig {
-	private static int partition;
+	private static int partition = 1;
 	
 	private static String zkUrl;
 	
@@ -24,6 +25,9 @@ public class DelayQueueConfig {
 	
 	@Value("${delay.queue.partition}")
 	public void setPartition(int partition){
+		if(partition>8){
+			throw new IllegalArgumentException("partition:"+partition);
+		}
 		DelayQueueConfig.partition = partition;
 	}
 

@@ -16,13 +16,24 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 	
 	private RedisTemplate redisTemplate;
 	
+	private volatile AtomicLong increment = new AtomicLong(1);
+	
 	public static final String PRE="easy_delay_queue_";
 	
 	public DelayQueueProducer(RedisTemplate redisTemplate){
 		this.redisTemplate = redisTemplate;
 	}
+	
+	/**
+	 * 得到相关redis前缀
+	 * @param topic
+	 * @param partition
+	 * @return
+	 */
+	public static String getDelayQueuePre(String topic,int partition){
+		return PRE+topic+partition;
+	}
 
-	private volatile AtomicLong increment = new AtomicLong(0);
 	
 	private void checkParams(int partition,String topic, String body, int time){
 		if(partition<0
@@ -81,7 +92,7 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 		
 		double score = Double.valueOf(String.valueOf(dto.getTimestamp()));
 		
-		this.redisTemplate.zadd(PRE+topic+dto.getPartition(),score,JSON.toJSONString(dto));
+		this.redisTemplate.zadd(getDelayQueuePre(topic,dto.getPartition()),score,JSON.toJSONString(dto));
 		
 	}
 

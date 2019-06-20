@@ -35,15 +35,11 @@ public class InitConsumerListener implements BeanPostProcessor, ApplicationListe
 	public void onApplicationEvent(ApplicationEvent event) {
 		if(event instanceof ApplicationReadyEvent){
 			
-			new QueueRecordConsumerPuller(map);
+			new QueueRecordConsumer(map).init();
 		}
 	}
 
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		return bean;
-	}
-
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		EnableDelayConsumer enable = bean.getClass().getAnnotation(EnableDelayConsumer.class);
 		if (enable == null) {
 			return bean;
@@ -51,6 +47,7 @@ public class InitConsumerListener implements BeanPostProcessor, ApplicationListe
 
 		Method[] methods = bean.getClass().getMethods();
 		for (Method m : methods) {
+			
 			DelayQueueListener listener = m.getAnnotation(DelayQueueListener.class);
 
 			if (listener != null) {
@@ -69,6 +66,11 @@ public class InitConsumerListener implements BeanPostProcessor, ApplicationListe
 			}
 		}
 
+		
+		return bean;
+	}
+
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
 

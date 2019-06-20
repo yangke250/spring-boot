@@ -16,7 +16,7 @@ import cn.linkedcare.springboot.redis.template.RedisTemplate;
 
 @Configurable
 @ComponentScan
-@SpringBootApplication
+//@SpringBootApplication
 public class Launch {
 	
 	public static void main(String[] args) throws InterruptedException{
@@ -27,7 +27,7 @@ public class Launch {
 	}
 	
 	@Bean
-	public DelayQueueProducer getDelayQueueProducer(@Qualifier RedisTemplate redisTemplate){
+	public DelayQueueProducer getDelayQueueProducer(@Qualifier("redisTemplate") RedisTemplate redisTemplate){
 		return new DelayQueueProducer(redisTemplate);
 	}
 }
