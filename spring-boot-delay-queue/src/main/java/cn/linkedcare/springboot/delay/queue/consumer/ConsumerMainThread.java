@@ -46,7 +46,7 @@ public class ConsumerMainThread {
 							String pre = DelayQueueProducer.getDelayQueuePre(c.getTopic(),c.getPartition());
 							
 							ConsumerSubThread cst = 
-									new ConsumerSubThread(c.getCondition(),redisTemplate,cdl,pre,c.getConsumerMethodDto());
+									new ConsumerSubThread(c.getLock(),c.getCondition(),redisTemplate,cdl,pre,c.getConsumerMethodDto());
 							
 							server.submit(cst);
 						}

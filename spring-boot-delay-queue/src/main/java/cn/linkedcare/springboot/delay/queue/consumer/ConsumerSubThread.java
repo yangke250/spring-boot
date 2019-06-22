@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.stereotype.Component;
 
@@ -28,8 +29,10 @@ public class ConsumerSubThread implements Callable<HashSet<String>>{
 	
 	private Condition condition; 
 	
+	private ReentrantLock lock;
 	
-	public ConsumerSubThread(Condition condition,RedisTemplate redisTemplate,CountDownLatch cdl,String pre,ConsumerMethodDto consumerMethodDto){
+	public ConsumerSubThread(ReentrantLock lock,Condition condition,RedisTemplate redisTemplate,CountDownLatch cdl,String pre,ConsumerMethodDto consumerMethodDto){
+		this.lock = lock;
 		this.redisTemplate = redisTemplate;
 		this.cdl = cdl;
 		this.pre = pre;
@@ -66,7 +69,13 @@ public class ConsumerSubThread implements Callable<HashSet<String>>{
 			}
 		}finally {
 			cdl.countDown();
-			condition.signalAll();
+			try{
+				lock.lock();
+				condition.signalAll();
+			}finally {
+				lock.unlock();
+			}
+			
 		}
 		return strs;
 	}

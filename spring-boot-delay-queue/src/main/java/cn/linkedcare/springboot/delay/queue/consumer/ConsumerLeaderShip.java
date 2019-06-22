@@ -59,6 +59,7 @@ public class ConsumerLeaderShip extends LeaderSelectorListenerAdapter implements
     			.topic(topic)
     			.consumerMethodDto(consumerMethodDto)
     			.condition(condition)
+    			.lock(lock)
     			.build();
     	
     	topicSet.add(consumerLeaderDto);
@@ -74,12 +75,6 @@ public class ConsumerLeaderShip extends LeaderSelectorListenerAdapter implements
 		}
     }
 
-    public static void main(String[] args) throws InterruptedException{
-    	ReentrantLock lock = new ReentrantLock();
-    	Condition condition1 = lock.newCondition();
-    	lock.lock();
-    	condition1.await();
-    	lock.unlock();
-	}
+
 	
 }
