@@ -26,7 +26,8 @@ public class ConsumerLeaderShip extends LeaderSelectorListenerAdapter implements
 	private String topic;
 	private ConsumerMethodDto consumerMethodDto;
 	private ConsumerLeaderDto consumerLeaderDto;
-	private final Condition condition = new ReentrantLock().newCondition();
+	private final ReentrantLock lock  = new ReentrantLock();
+	private final Condition condition = lock.newCondition();
 	
     public ConsumerLeaderShip(String topic,ConsumerMethodDto consumerMethodDto,CuratorFramework client, String path) {
         this.topic = topic;
@@ -62,12 +63,23 @@ public class ConsumerLeaderShip extends LeaderSelectorListenerAdapter implements
     	
     	topicSet.add(consumerLeaderDto);
     	
-    	Thread.sleep(60*60*1000);//1个小时以后释放领导权
+    	Thread.sleep(10*60*1000);//10分钟释放领导权
     	
     	topicSet.remove(consumerLeaderDto);
-    	
-    	condition.await();
+    	try{
+    		lock.lock();
+    		condition.await();
+    	}finally {
+			lock.unlock();
+		}
     }
 
+    public static void main(String[] args) throws InterruptedException{
+    	ReentrantLock lock = new ReentrantLock();
+    	Condition condition1 = lock.newCondition();
+    	lock.lock();
+    	condition1.await();
+    	lock.unlock();
+	}
 	
 }

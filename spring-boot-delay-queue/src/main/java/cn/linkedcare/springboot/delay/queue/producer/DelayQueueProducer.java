@@ -4,6 +4,7 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson.JSON;
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -34,6 +35,15 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 		return PRE+topic+partition;
 	}
 
+	/**
+	 * 得到额外缓存的key
+	 * @param topic
+	 * @param key
+	 * @return
+	 */
+	private static String getStoreKey(String topic,String key){
+		return topic+"_"+key;
+	}
 	
 	private void checkParams(int partition,String topic, String body, int time){
 		if(partition<0
@@ -45,11 +55,24 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 		}
 	}
 	
+	
 	@Override
 	public DelayQueueRecordDto sendDelayMsg(String topic, String body, int time, TimeUnit timeUnit) {
 		int partition= (int) (increment.getAndIncrement()/DelayQueueConfig.getPartition());
 		
-		return sendDelayMsg(partition,topic,body,time,timeUnit);
+		DelayQueueRecordDto dto = sendDelayMsg(partition,topic,body,time,timeUnit);
+		return dto;
+	}
+	
+	@Override
+	public DelayQueueRecordDto sendDelayMsg(String topic, String body, int time, TimeUnit timeUnit,String key) {
+		DelayQueueRecordDto dto = sendDelayMsg(topic,body,time,timeUnit);
+		
+		this.redisTemplate.zadd(getStoreKey(topic,key),dto.getTimestamp(),JSON.toJSONString(dto));
+		
+		this.redisTemplate.expire(getStoreKey(topic,key),changeSeconds(time,timeUnit));
+		
+		return dto;
 	}
 	
 	private DelayQueueRecordDto createDelayQueueRecordDto(int partition, String topic, String body,int time, TimeUnit timeUnit){
@@ -103,5 +126,17 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 		long  result = this.redisTemplate.zrem(getDelayQueuePre(dto.getTopic(),dto.getPartition()),JSON.toJSONString(dto));
 		return result>0?true:false;
 	}
+
+
+	@Override
+	public boolean deleteDelayMsg(String topic, String key) {
+		Set<String> strs = this.redisTemplate.zrange(getStoreKey(topic,key),0,500);
+		//只有1个数据分片
+	    this.redisTemplate.zrem(getDelayQueuePre(topic,1), strs.toArray(new String[strs.size()]));
+	    
+	    return true;
+	}
+
+	
 
 }

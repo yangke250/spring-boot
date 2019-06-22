@@ -20,6 +20,14 @@ public interface IDelayQueueProducer {
 	public DelayQueueRecordDto sendDelayMsg(String topic,String body,int time,TimeUnit timeUnit);
 	
 	
+	/**
+	 * 发送延时消息
+	 * @param topic
+	 * @param body
+	 * @param time
+	 * @param timeUnit
+	 */
+	public DelayQueueRecordDto sendDelayMsg(String topic,String body,int time,TimeUnit timeUnit,String key);
 	
 	/**
 	 * 发送延时消息
@@ -36,4 +44,12 @@ public interface IDelayQueueProducer {
 	 * @return
 	 */
 	public boolean deleteDelayMsg(DelayQueueRecordDto delayQueueRecordDto);
+	
+	/**
+	 * 删除延时发送的队列消息
+	 * @param topic
+	 * @param key
+	 * @return
+	 */
+	public boolean deleteDelayMsg(String topic,String key);
 }
