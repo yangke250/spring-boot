@@ -46,10 +46,10 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 	}
 	
 	@Override
-	public void sendDelayMsg(String topic, String body, int time, TimeUnit timeUnit) {
+	public DelayQueueRecordDto sendDelayMsg(String topic, String body, int time, TimeUnit timeUnit) {
 		int partition= (int) (increment.getAndIncrement()/DelayQueueConfig.getPartition());
 		
-		sendDelayMsg(partition,topic,body,time,timeUnit);
+		return sendDelayMsg(partition,topic,body,time,timeUnit);
 	}
 	
 	private DelayQueueRecordDto createDelayQueueRecordDto(int partition, String topic, String body,int time, TimeUnit timeUnit){
@@ -85,7 +85,7 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 	}
 
 	@Override
-	public void sendDelayMsg(int partition, String topic, String body,int time, TimeUnit timeUnit) {
+	public DelayQueueRecordDto sendDelayMsg(int partition, String topic, String body,int time, TimeUnit timeUnit) {
 		checkParams(partition,topic,body,time);
 		
 		DelayQueueRecordDto dto = createDelayQueueRecordDto(partition,topic,body,time,timeUnit);
@@ -94,6 +94,14 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 		
 		this.redisTemplate.zadd(getDelayQueuePre(topic,dto.getPartition()),score,JSON.toJSONString(dto));
 		
+		return dto;
+	}
+
+	@Override
+	public boolean deleteDelayMsg(DelayQueueRecordDto dto) {
+
+		long  result = this.redisTemplate.zrem(getDelayQueuePre(dto.getTopic(),dto.getPartition()),JSON.toJSONString(dto));
+		return result>0?true:false;
 	}
 
 }

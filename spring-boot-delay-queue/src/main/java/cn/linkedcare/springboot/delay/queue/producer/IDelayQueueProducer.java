@@ -1,5 +1,6 @@
 package cn.linkedcare.springboot.delay.queue.producer;
 
+import cn.linkedcare.springboot.delay.queue.dto.DelayQueueRecordDto;
 import cn.linkedcare.springboot.delay.queue.enums.TimeUnit;
 
 /**
@@ -16,7 +17,7 @@ public interface IDelayQueueProducer {
 	 * @param time
 	 * @param timeUnit
 	 */
-	public void sendDelayMsg(String topic,String body,int time,TimeUnit timeUnit);
+	public DelayQueueRecordDto sendDelayMsg(String topic,String body,int time,TimeUnit timeUnit);
 	
 	
 	
@@ -27,6 +28,12 @@ public interface IDelayQueueProducer {
 	 * @param time
 	 * @param timeUnit
 	 */
-	public void sendDelayMsg(int partition,String topic,String body,int time,TimeUnit timeUnit);
+	public DelayQueueRecordDto sendDelayMsg(int partition,String topic,String body,int time,TimeUnit timeUnit);
 	
+	/**
+	 * 删除延时发送的队列消息
+	 * @param delayQueueRecordDto
+	 * @return
+	 */
+	public boolean deleteDelayMsg(DelayQueueRecordDto delayQueueRecordDto);
 }
