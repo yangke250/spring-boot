@@ -27,7 +27,7 @@ public interface IDelayQueueProducer {
 	 * @param time
 	 * @param timeUnit
 	 */
-	public DelayQueueRecordDto sendDelayMsg(String topic,String body,int time,TimeUnit timeUnit,String key);
+	public DelayQueueRecordDto sendDelayMsg(String topic,String body,int time,TimeUnit timeUnit,String deleteKey);
 	
 	/**
 	 * 发送延时消息
@@ -51,5 +51,5 @@ public interface IDelayQueueProducer {
 	 * @param key
 	 * @return
 	 */
-	public boolean deleteDelayMsg(String topic,String key);
+	public boolean deleteDelayMsg(String topic,String deleteKey);
 }
