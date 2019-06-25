@@ -65,16 +65,25 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 	}
 	
 	@Override
-	public DelayQueueRecordDto sendDelayMsg(String topic, String body, int time, TimeUnit timeUnit,String key) {
+	public DelayQueueRecordDto sendDelayMsg(String topic, String body, int time, TimeUnit timeUnit,String deleteKey) {
 		DelayQueueRecordDto dto = sendDelayMsg(topic,body,time,timeUnit);
 		
-		this.redisTemplate.zadd(getStoreKey(topic,key),dto.getTimestamp(),JSON.toJSONString(dto));
+		this.redisTemplate.zadd(getStoreKey(topic,deleteKey),dto.getTimestamp(),JSON.toJSONString(dto));
 		
-		this.redisTemplate.expire(getStoreKey(topic,key),changeSeconds(time,timeUnit));
+		this.redisTemplate.expire(getStoreKey(topic,deleteKey),changeSeconds(time,timeUnit));
 		
 		return dto;
 	}
 	
+	/**
+	 * 创建延时队列dto
+	 * @param partition
+	 * @param topic
+	 * @param body
+	 * @param time
+	 * @param timeUnit
+	 * @return
+	 */
 	private DelayQueueRecordDto createDelayQueueRecordDto(int partition, String topic, String body,int time, TimeUnit timeUnit){
 		DelayQueueRecordDto delayQueueRecordDto = new DelayQueueRecordDto();
 		delayQueueRecordDto.setPartition(partition);
@@ -129,10 +138,13 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 
 
 	@Override
-	public boolean deleteDelayMsg(String topic, String key) {
+	public boolean deleteDelayMsg(String topic, String key){
+		//超过500不做处理
 		Set<String> strs = this.redisTemplate.zrange(getStoreKey(topic,key),0,500);
 		//只有1个数据分片
 	    this.redisTemplate.zrem(getDelayQueuePre(topic,1), strs.toArray(new String[strs.size()]));
+	    
+	    this.redisTemplate.del(getStoreKey(topic,key));
 	    
 	    return true;
 	}
