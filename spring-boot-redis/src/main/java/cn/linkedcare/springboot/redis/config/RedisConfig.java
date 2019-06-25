@@ -104,7 +104,7 @@ public class RedisConfig {
 	}
 
 
-	@Bean
+	@Bean("redisTemplate")
 	@ConditionalOnMissingBean(RwSplitRedisTemplate.class)
 	public RwSplitRedisTemplate createRwSplitRedisTemplate(){
 		RwSplitRedisTemplate rwSplitRedisTemplate = new RwSplitRedisTemplate(createJedisPool());

@@ -13,4 +13,5 @@ import cn.linkedcare.springboot.redis.template.RedisTemplate;
 @ComponentScan
 @Import(value={RedisConfig.class})
 public class Launch {
+	
 }

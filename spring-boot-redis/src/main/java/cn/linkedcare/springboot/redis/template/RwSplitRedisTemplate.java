@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
  * @author wl
  *
  */
+
 public class RwSplitRedisTemplate implements RedisTemplate {
 
     private final static Logger log           = LoggerFactory.getLogger(RwSplitRedisTemplate.class);

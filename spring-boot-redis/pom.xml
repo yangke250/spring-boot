@@ -3,7 +3,7 @@
   <parent>
     <groupId>cn.linkedcare.springboot</groupId>
     <artifactId>spring-boot</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
   </parent>
   <artifactId>spring-boot-redis</artifactId>
    <dependencies>
