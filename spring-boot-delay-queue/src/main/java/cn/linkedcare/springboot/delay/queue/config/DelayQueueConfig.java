@@ -16,7 +16,7 @@ ignoreResourceNotFound = true, encoding = "UTF-8")
 public class DelayQueueConfig {
 	public static int DEFAULT_PARTITION = 0;
 	
-	private static int partition;
+	private static int partition=1;
 	
 	private static String zkUrl;
 	
