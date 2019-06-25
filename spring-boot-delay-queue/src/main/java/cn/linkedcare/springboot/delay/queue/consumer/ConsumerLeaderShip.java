@@ -14,6 +14,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
 
+import cn.linkedcare.springboot.delay.queue.config.DelayQueueConfig;
 import cn.linkedcare.springboot.delay.queue.dto.ConsumerLeaderDto;
 import cn.linkedcare.springboot.delay.queue.dto.ConsumerMethodDto;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,7 @@ public class ConsumerLeaderShip extends LeaderSelectorListenerAdapter implements
     @Override
     public void takeLeadership(CuratorFramework client) throws Exception {
     	this.consumerLeaderDto = ConsumerLeaderDto.builder()
-    			.partition(1)
+    			.partition(DelayQueueConfig.DEFAULT_PARTITION)
     			.topic(topic)
     			.consumerMethodDto(consumerMethodDto)
     			.condition(condition)

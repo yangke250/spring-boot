@@ -51,14 +51,22 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 				||StringUtils.isEmpty(topic)
 				||StringUtils.isEmpty(body)
 				||time<=0){
-			throw new IllegalArgumentException(partition+":"+topic+":"+body+":"+time);
+			throw new IllegalArgumentException(partition+":"+DelayQueueConfig.getPartition()+":"+topic+":"+body+":"+time);
+		}
+	}
+	
+	public static void main(String[] args){
+		AtomicLong increment = new AtomicLong(1);
+
+		while(true){
+			System.out.println((increment.getAndIncrement()%2));
 		}
 	}
 	
 	
 	@Override
 	public DelayQueueRecordDto sendDelayMsg(String topic, String body, int time, TimeUnit timeUnit) {
-		int partition= (int) (increment.getAndIncrement()/DelayQueueConfig.getPartition());
+		int partition= (int) (increment.getAndIncrement()%DelayQueueConfig.getPartition());
 		
 		DelayQueueRecordDto dto = sendDelayMsg(partition,topic,body,time,timeUnit);
 		return dto;
@@ -142,7 +150,7 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 		//超过500不做处理
 		Set<String> strs = this.redisTemplate.zrange(getStoreKey(topic,key),0,500);
 		//只有1个数据分片
-	    this.redisTemplate.zrem(getDelayQueuePre(topic,1), strs.toArray(new String[strs.size()]));
+	    this.redisTemplate.zrem(getDelayQueuePre(topic,DelayQueueConfig.DEFAULT_PARTITION), strs.toArray(new String[strs.size()]));
 	    
 	    this.redisTemplate.del(getStoreKey(topic,key));
 	    

@@ -14,7 +14,9 @@ value = {
 		"classpath:application-delay-queue-${spring.profiles.active}.properties"},
 ignoreResourceNotFound = true, encoding = "UTF-8")
 public class DelayQueueConfig {
-	private static int partition = 1;
+	public static int DEFAULT_PARTITION = 0;
+	
+	private static int partition;
 	
 	private static String zkUrl;
 	
