@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class DelayQueueRecordDto {
-	private String uid;
+	private String id;
 	private String topic;
 	private String body;
 	private int partition;
@@ -16,14 +16,14 @@ public class DelayQueueRecordDto {
 	
 	@Override
 	public boolean equals(Object obj) {
-		String objUid = ((DelayQueueRecordDto)obj).getUid();
+		String objUid = ((DelayQueueRecordDto)obj).getId();
         
-		return (this.uid.equals(objUid));
+		return (this.id.equals(objUid));
     }
 	
 	@Override
 	public int hashCode(){
-		return uid.hashCode();
+		return id.hashCode();
 	}
 	
 }

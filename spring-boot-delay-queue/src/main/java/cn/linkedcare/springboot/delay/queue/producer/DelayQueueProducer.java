@@ -99,7 +99,7 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 		long timestamp = System.currentTimeMillis()/1000+changeSeconds(time,timeUnit);
 		delayQueueRecordDto.setTimestamp(timestamp);
 		delayQueueRecordDto.setTopic(topic);
-		delayQueueRecordDto.setUid(UUID.randomUUID().toString());
+		delayQueueRecordDto.setId(UUID.randomUUID().toString());
 		delayQueueRecordDto.setBody(body);
 		
 		return delayQueueRecordDto;
