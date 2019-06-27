@@ -17,7 +17,7 @@ import cn.linkedcare.springboot.redis.template.RedisTemplate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ConsumerSubThread implements Callable<HashSet<String>>{
+public class ConsumerSubThread implements Callable<Integer>{
 
 	private RedisTemplate redisTemplate;
 	
@@ -41,31 +41,33 @@ public class ConsumerSubThread implements Callable<HashSet<String>>{
 	}
 	
 	@Override
-	public HashSet<String> call() throws Exception {
-		HashSet<String> strs = new HashSet<String>();
+	public Integer call() throws Exception {
+		int end = -1;
 		
 		try{
-			Set<String> sets = this.redisTemplate.zrange(pre,0,10);
+			Set<String> sets = this.redisTemplate.zrange(pre,0,50);
 			long now = System.currentTimeMillis()/1000;
+			
 			for(String set:sets){
 				DelayQueueRecordDto dto = JSON.parseObject(set,DelayQueueRecordDto.class);
 				if(dto.getTimestamp()<=now){
 					try{
 						consumerMethodDto.getMethod().invoke(consumerMethodDto.getObject(),dto);
 						
-						strs.add(set);
+						end++;
 					}catch(Exception e){
 						e.printStackTrace();
-						log.error("exception:",e);
+						log.error("delay queue exception:",e);
 						
 						if(consumerMethodDto.isAutoCommit()){
-							strs.add(set);	
+							end++;	
 						}
 					}
 				}
 			}
-			if(strs.size()>0){
-				this.redisTemplate.zrem(pre,strs.toArray(new String[strs.size()]));
+			if(end>=0){
+				log.info("delay queue zrem :{},{}",pre,end);
+				this.redisTemplate.zremrangeByRank(pre,0,end);
 			}
 		}finally {
 			cdl.countDown();
@@ -77,7 +79,8 @@ public class ConsumerSubThread implements Callable<HashSet<String>>{
 			}
 			
 		}
-		return strs;
+		
+		return end;
 	}
 	
 }
