@@ -23,12 +23,14 @@ import cn.linkedcare.springboot.delay.queue.annotation.DelayQueueListener;
 import cn.linkedcare.springboot.delay.queue.annotation.EnableDelayConsumer;
 import cn.linkedcare.springboot.delay.queue.dto.ConsumerMethodDto;
 import cn.linkedcare.springboot.delay.queue.dto.DelayQueueRecordDto;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 消费者相关初始化
  * @author wl
  *
  */
+@Slf4j
 @Component
 public class InitConsumerListener implements BeanPostProcessor, ApplicationListener<ApplicationEvent> {
 
@@ -75,10 +77,13 @@ public class InitConsumerListener implements BeanPostProcessor, ApplicationListe
 				dto.setTopics(topics);
 				
 				
-				for(String topic:listener.topic()){
+				for(String topic:topics){
 					map.put(topic,dto);
 				}
+
+				log.info("delay queue",map);
 			}
+			
 		}
 
 		
