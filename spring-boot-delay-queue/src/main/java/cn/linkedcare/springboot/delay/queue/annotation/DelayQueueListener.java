@@ -24,4 +24,10 @@ public @interface DelayQueueListener {
 	 * @return
 	 */
 	public boolean aotuCommit() default false;
+	
+	/**
+	 * topic是否从yml里面取值
+	 * @return
+	 */
+	public boolean topicYml() default false;
 }

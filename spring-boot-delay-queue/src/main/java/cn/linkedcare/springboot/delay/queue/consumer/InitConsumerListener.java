@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.context.event.ApplicationPreparedEvent;
@@ -14,6 +16,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import cn.linkedcare.springboot.delay.queue.annotation.DelayQueueListener;
@@ -31,6 +34,8 @@ public class InitConsumerListener implements BeanPostProcessor, ApplicationListe
 
 	private Map<String,ConsumerMethodDto> map = new ConcurrentHashMap<String,ConsumerMethodDto>();
 
+	@Resource
+	private Environment environment;
 	
 	public void onApplicationEvent(ApplicationEvent event) {
 		if(event instanceof ApplicationReadyEvent){
@@ -58,7 +63,17 @@ public class InitConsumerListener implements BeanPostProcessor, ApplicationListe
 				ConsumerMethodDto dto = new ConsumerMethodDto();
 				dto.setMethod(m);
 				dto.setObject(bean);
-				dto.setTopics(listener.topic());
+				
+				String[] topics = listener.topic();
+				//如果走环境变量
+				if(listener.topicYml()){
+					for(int i=0;i<topics.length;i++){
+						topics[i]= environment.getProperty(topics[i]);
+					}
+				}
+				
+				dto.setTopics(topics);
+				
 				
 				for(String topic:listener.topic()){
 					map.put(topic,dto);

@@ -93,7 +93,7 @@ public class QueueRecordConsumer {
 	}
 
 	/**
-	 * 创建领导者
+	 * 创建消费者
 	 * 
 	 * @param client
 	 * @param topic
