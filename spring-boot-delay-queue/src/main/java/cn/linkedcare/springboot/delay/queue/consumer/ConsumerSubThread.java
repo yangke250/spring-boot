@@ -52,6 +52,9 @@ public class ConsumerSubThread implements Callable<Integer>{
 				DelayQueueRecordDto dto = JSON.parseObject(set,DelayQueueRecordDto.class);
 				if(dto.getTimestamp()<=now){
 					try{
+						log.info("delay queue consumerSubThread:{}",JSON.toJSONString(dto));
+
+						
 						consumerMethodDto.getMethod().invoke(consumerMethodDto.getObject(),dto);
 						
 						end++;

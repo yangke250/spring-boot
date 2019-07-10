@@ -41,7 +41,7 @@ public class InitConsumerListener implements BeanPostProcessor, ApplicationListe
 	
 	public void onApplicationEvent(ApplicationEvent event) {
 		if(event instanceof ApplicationReadyEvent){
-			
+			log.info("delay queue:{}",map);
 			new QueueRecordConsumer(map).init();
 		}
 	}
@@ -81,7 +81,7 @@ public class InitConsumerListener implements BeanPostProcessor, ApplicationListe
 					map.put(topic,dto);
 				}
 
-				log.info("delay queue",map);
+				
 			}
 			
 		}

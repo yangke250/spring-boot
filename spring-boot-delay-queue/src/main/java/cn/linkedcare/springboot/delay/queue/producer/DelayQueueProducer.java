@@ -12,7 +12,10 @@ import cn.linkedcare.springboot.delay.queue.config.DelayQueueConfig;
 import cn.linkedcare.springboot.delay.queue.dto.DelayQueueRecordDto;
 import cn.linkedcare.springboot.delay.queue.enums.TimeUnit;
 import cn.linkedcare.springboot.redis.template.RedisTemplate;
+import lombok.extern.slf4j.Slf4j;
+import sun.util.logging.resources.logging;
 
+@Slf4j
 public class DelayQueueProducer implements IDelayQueueProducer{
 	
 	private RedisTemplate redisTemplate;
@@ -127,6 +130,8 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 	@Override
 	public DelayQueueRecordDto sendDelayMsg(int partition, String topic, String body,int time, TimeUnit timeUnit) {
 		checkParams(partition,topic,body,time);
+		
+		log.info("sendDelayMsg:{},{},{},{}",topic,partition,time,timeUnit);
 		
 		DelayQueueRecordDto dto = createDelayQueueRecordDto(partition,topic,body,time,timeUnit);
 		
