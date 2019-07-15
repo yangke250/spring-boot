@@ -131,13 +131,13 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 	public DelayQueueRecordDto sendDelayMsg(int partition, String topic, String body,int time, TimeUnit timeUnit) {
 		checkParams(partition,topic,body,time);
 		
-		log.info("sendDelayMsg:{},{},{},{}",topic,partition,time,timeUnit);
-		
 		DelayQueueRecordDto dto = createDelayQueueRecordDto(partition,topic,body,time,timeUnit);
 		
 		double score = Double.valueOf(String.valueOf(dto.getTimestamp()));
 		
 		this.redisTemplate.zadd(getDelayQueuePre(topic,dto.getPartition()),score,JSON.toJSONString(dto));
+		
+		log.info("sendDelayMsg:{},{},{},{},{}",dto.getId(),topic,partition,time,timeUnit);
 		
 		return dto;
 	}

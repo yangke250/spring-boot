@@ -1,6 +1,8 @@
 package cn.linkedcare.springboot.delay.queue.consumer;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -42,7 +44,8 @@ public class ConsumerSubThread implements Callable<Integer>{
 	
 	@Override
 	public Integer call() throws Exception {
-		int end = -1;
+		
+		List<String> list = new ArrayList<String>();
 		
 		try{
 			Set<String> sets = this.redisTemplate.zrange(pre,0,50);
@@ -52,25 +55,25 @@ public class ConsumerSubThread implements Callable<Integer>{
 				DelayQueueRecordDto dto = JSON.parseObject(set,DelayQueueRecordDto.class);
 				if(dto.getTimestamp()<=now){
 					try{
-						log.info("delay queue consumerSubThread:{}",JSON.toJSONString(dto));
+						log.info("delay queue consumerSubThread:{},{}",dto.getId(),JSON.toJSONString(dto));
 
 						
 						consumerMethodDto.getMethod().invoke(consumerMethodDto.getObject(),dto);
 						
-						end++;
+						list.add(set);
 					}catch(Exception e){
 						e.printStackTrace();
-						log.error("delay queue exception:",e);
+						log.error("delay queue exception:{},{}",dto.getId(),e);
 						
 						if(consumerMethodDto.isAutoCommit()){
-							end++;	
+							list.add(set);	
 						}
 					}
 				}
 			}
-			if(end>=0){
-				log.info("delay queue zrem :{},{}",pre,end);
-				this.redisTemplate.zremrangeByRank(pre,0,end);
+			if(list.size()>=0){
+				log.info("delay queue zrem :{},{}",pre,list.size());
+				this.redisTemplate.zrem(pre,list.toArray(new String[]{}));
 			}
 		}finally {
 			cdl.countDown();
@@ -83,7 +86,7 @@ public class ConsumerSubThread implements Callable<Integer>{
 			
 		}
 		
-		return end;
+		return list.size();
 	}
 	
 }
