@@ -55,7 +55,7 @@ public class ConsumerSubThread implements Callable<Integer>{
 				DelayQueueRecordDto dto = JSON.parseObject(set,DelayQueueRecordDto.class);
 				if(dto.getTimestamp()<=now){
 					try{
-						log.info("delay queue consumerSubThread:{},{}",dto.getId(),JSON.toJSONString(dto));
+						log.info("delay queue consumerSubThread:{},{}",dto.getId(),dto.getBody().length());
 
 						
 						consumerMethodDto.getMethod().invoke(consumerMethodDto.getObject(),dto);
@@ -71,7 +71,7 @@ public class ConsumerSubThread implements Callable<Integer>{
 					}
 				}
 			}
-			if(list.size()>=0){
+			if(list.size()>0){
 				log.info("delay queue zrem :{},{}",pre,list.size());
 				this.redisTemplate.zrem(pre,list.toArray(new String[]{}));
 			}

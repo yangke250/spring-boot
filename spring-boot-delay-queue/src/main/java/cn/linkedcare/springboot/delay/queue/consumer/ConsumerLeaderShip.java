@@ -65,15 +65,16 @@ public class ConsumerLeaderShip extends LeaderSelectorListenerAdapter implements
     	
     	topicSet.add(consumerLeaderDto);
     	
-    	Thread.sleep(10*60*1000);//10分钟释放领导权
+    	Thread.sleep(60*60*1000);//1个小时释放领导权
     	
-    	topicSet.remove(consumerLeaderDto);
     	try{
     		lock.lock();
     		condition.await();
     	}finally {
-			lock.unlock();
+        	topicSet.remove(consumerLeaderDto);
+    		lock.unlock();
 		}
+    	
     }
 
     

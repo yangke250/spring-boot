@@ -137,7 +137,7 @@ public class DelayQueueProducer implements IDelayQueueProducer{
 		
 		this.redisTemplate.zadd(getDelayQueuePre(topic,dto.getPartition()),score,JSON.toJSONString(dto));
 		
-		log.info("sendDelayMsg:{},{},{},{},{}",dto.getId(),topic,partition,time,timeUnit);
+		log.info("sendDelayMsg : {},{},{},{},{}",dto.getId(),topic,partition,time,timeUnit);
 		
 		return dto;
 	}
