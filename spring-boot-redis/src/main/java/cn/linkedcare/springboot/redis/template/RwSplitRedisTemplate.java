@@ -301,6 +301,17 @@ public class RwSplitRedisTemplate implements RedisTemplate {
         }, key, start, end);
     }
 
+    @Override
+    public Set<String> zrevrange(String key, long start, long end) {
+        return executeCommand(new JedisCommandExecutor<Set<String>>() {
+            public Set<String> execute(Jedis resource, Object... argArray) {
+                return resource.zrevrange((String) argArray[0],
+                        (Long) argArray[1], (Long) argArray[2]);
+            }
+        }, key, start, end);
+    }
+    
+    
     public Set<Tuple> zrevrangeWithScores(String key, int start, int end) {
         return executeCommand(new JedisCommandExecutor<Set<Tuple>>() {
             public Set<Tuple> execute(Jedis resource, Object... argArray) {
@@ -1091,5 +1102,30 @@ public class RwSplitRedisTemplate implements RedisTemplate {
 				return null;
 			}			
         },jedisPubSub,patterns);
+	}
+
+	@Override
+	public long del(byte[]... keys) {
+		Long result = executeCommand(new JedisCommandExecutor<Long>() {
+			@Override
+			public Long execute(Jedis resource, Object... argArray) {
+				return resource.del(keys);
+			}			
+        },keys);
+		
+		return result;
+	}
+
+	@Override
+	public List<byte[]> mget(byte[]... keys) {
+		
+		List<byte[]> result = executeCommand(new JedisCommandExecutor<List<byte[]>>() {
+			@Override
+			public List<byte[]> execute(Jedis resource, Object... argArray) {
+				return resource.mget(keys);
+			}			
+        },keys);
+		
+		return result;
 	}
 }

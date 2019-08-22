@@ -33,6 +33,14 @@ public interface RedisTemplate {
 	 */
 	public List<String> mget(String... keys);
 
+	
+	/**
+	 * 得到string类型的多个值
+	 * @param keys
+	 * @return
+	 */
+	public List<byte[]> mget(byte[]... keys);
+	
 	/**
 	 * 得到set数据结构所有成员列表
 	 * @param key
@@ -89,6 +97,15 @@ public interface RedisTemplate {
      */
     public String setex(byte[] key, int seconds,byte[] values);
     
+    /**
+     * 反向查询set的值
+     * @param key
+     * @param start
+     * @param end
+     * @return
+     */
+    public Set<String> zrevrange(String key, long start, long end);
+    
     public String get(String key);
     
     public byte[] get(byte[] key);
@@ -118,8 +135,11 @@ public interface RedisTemplate {
 
     public double zscore(String key, String member);
     Double getZScore(String key, String member);
+    
     public long del(String key);
 
+    public long del(byte[]... key);
+    
     public long zrem(String key, String member);
 
     public long zrem(String key, String[] members);
