@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -60,15 +61,17 @@ public class KafkaProducerConfig {
         return props;
     }
 
-    public ProducerFactory<String, String> producerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigs());
+    @Bean("producerFactory")
+    public DefaultKafkaProducerFactory producerFactory() {
+ 
+    	return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
     
     
 
     @Bean
     @ConditionalOnMissingBean(KafkaTemplate.class)
-    public KafkaTemplate<String, String> kafkaTemplate() {
-        return new KafkaTemplate<String, String>(producerFactory());
+    public KafkaTemplate<String, String> kafkaTemplate(@Qualifier("producerFactory") DefaultKafkaProducerFactory factory) {
+        return new KafkaTemplate<String, String>(factory);
     }
 }
