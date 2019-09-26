@@ -3,6 +3,9 @@ package cn.linkedcare.springboot.kafka.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -67,7 +70,12 @@ public class KafkaProducerConfig {
     	return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
     
-    
+    @Bean
+    @ConditionalOnMissingBean(KafkaProducer.class)
+    private KafkaProducer kafkaProducer(@Qualifier("producerFactory") DefaultKafkaProducerFactory producerFactory){
+    	
+    	return (KafkaProducer) producerFactory.createProducer();
+    }
 
     @Bean
     @ConditionalOnMissingBean(KafkaTemplate.class)
