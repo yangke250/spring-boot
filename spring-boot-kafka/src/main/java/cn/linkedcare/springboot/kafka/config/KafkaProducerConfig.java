@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -71,10 +72,8 @@ public class KafkaProducerConfig {
     }
     
     @Bean
-    @ConditionalOnMissingBean(KafkaProducer.class)
-    private KafkaProducer kafkaProducer(@Qualifier("producerFactory") DefaultKafkaProducerFactory producerFactory){
-    	
-    	return (KafkaProducer) producerFactory.createProducer();
+    private Producer kafkaProducer(@Qualifier("producerFactory") DefaultKafkaProducerFactory producerFactory){
+    	return  producerFactory.createProducer();
     }
 
     @Bean
