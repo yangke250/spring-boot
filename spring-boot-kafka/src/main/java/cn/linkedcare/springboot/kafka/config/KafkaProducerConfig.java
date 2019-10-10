@@ -23,6 +23,8 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 @PropertySource(
 value = {
@@ -31,6 +33,7 @@ value = {
 ignoreResourceNotFound = true, encoding = "UTF-8")
 @Configurable
 @Order
+@Slf4j
 public class KafkaProducerConfig {
 
 	@Value("${kafka.servers}")
@@ -51,6 +54,7 @@ public class KafkaProducerConfig {
     private String acks;
     
     public Map<String, Object> producerConfigs() {
+    	log.info("KafkaProducerConfig-----------------:{}",servers);
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.ACKS_CONFIG, acks);
         props.put(ProducerConfig.CLIENT_ID_CONFIG, groupId);
