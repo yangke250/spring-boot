@@ -71,10 +71,10 @@ public class KafkaProducerConfig {
     	return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
     
-    @Bean
-    private Producer kafkaProducer(@Qualifier("producerFactory") DefaultKafkaProducerFactory producerFactory){
-    	return  producerFactory.createProducer();
-    }
+//    @Bean
+//    private Producer kafkaProducer(@Qualifier("producerFactory") DefaultKafkaProducerFactory producerFactory){
+//    	return  producerFactory.createProducer();
+//    }
 
     @Bean
     @ConditionalOnMissingBean(KafkaTemplate.class)
