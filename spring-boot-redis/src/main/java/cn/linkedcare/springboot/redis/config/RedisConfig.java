@@ -77,7 +77,7 @@ public class RedisConfig {
 	
 		
 		log.info("=========================================");
-		log.info("=============spring redis host==========="+redisUrl+"===="+redisPassword);
+		log.info("=============spring redis host===="+redisType+"===="+redisUrl+"===="+redisPassword);
 
 		
 		//不为空的时候设置值
